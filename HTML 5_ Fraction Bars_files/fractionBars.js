@@ -856,4 +856,3 @@ function drawFractionBars() {
 // Redraw whenever the canvas size changes
 window.addEventListener('resize', drawFractionBars);
 drawFractionBars();
-
