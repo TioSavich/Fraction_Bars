@@ -1032,7 +1032,7 @@ FractionBarsCanvas.prototype.restoreBarsAndMatsFromJSON = function(JSON_obj) {
 };
 
 FractionBarsCanvas.prototype.print_canvas = function (){
-    var canvas=document.getElementById("fbCanvas");
+    var canvas=document.getElementById('fbCanvas');
 	//var ctx=canvas.canvasContext;
 	var win=window.open();
     win.document.write("<html><br><img src='"+canvas.toDataURL()+"'/></html>");
@@ -1043,6 +1043,35 @@ FractionBarsCanvas.prototype.print_canvas = function (){
 // FractionBarsCanvas.js - Updated for iPad compatibility and improved drag gesture support with visual feedback
 
 // Adding support for touch events and dragging functionality
+let isDragging = false;
+let dragStartX = 0;
+let dragStartY = 0;
+
+function setupEventListeners(canvas) {
+    // Existing mouse events
+    canvas.addEventListener('mousedown', function(e) {
+        handleMouseDown(e);
+        isDragging = true;
+        dragStartX = e.clientX;
+        dragStartY = e.clientY;
+        displayStatus('Mouse down at: ' + dragStartX + ', ' + dragStartY);
+    });
+    
+    canvas.addEventListener('mousemove', function(e) {
+        if (isDragging) {
+            handleMouseMove(e);
+            drawDragBar(e.clientX, e.clientY);
+            displayStatus('Mouse move at: ' + e.clientX + ', ' + e.clientY);
+        }
+    });
+    
+    canvas.addEventListener('mouseup', function(e) {
+        handleMouseUp(e);
+        isDragging = false;
+        displayStatus('Mouse up at: ' + e.clientX + ', ' + e.clientY);
+    });
+    
+  // Adding support for touch events and dragging functionality
 let isDragging = false;
 let dragStartX = 0;
 let dragStartY = 0;
@@ -1101,7 +1130,9 @@ function setupEventListeners(canvas) {
         displayStatus('Touch end');
     });
 }
-
+const canvas = document.getElementById('fbCanvas');
+setupEventListeners(canvas)
+	
 // Utility function to convert touch events to mouse events
 function convertTouchToMouseEvent(touchEvent) {
     const touch = touchEvent.touches[0] || touchEvent.changedTouches[0];
@@ -1110,6 +1141,15 @@ function convertTouchToMouseEvent(touchEvent) {
         clientY: touch.clientY,
         button: 0 // Simulate left mouse button
     };
+}
+
+// Utility functions to disable and enable page scrolling
+function disablePageScrolling() {
+    document.body.style.overflow = 'hidden';
+}
+
+function enablePageScrolling() {
+    document.body.style.overflow = 'auto';
 }
 
 // Utility functions to disable and enable page scrolling
