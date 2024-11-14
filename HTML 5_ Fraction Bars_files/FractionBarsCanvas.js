@@ -1074,6 +1074,7 @@ function setupEventListeners(canvas) {
     // Adding touch events for iPad
     canvas.addEventListener('touchstart', function(e) {
         e.preventDefault();
+        disablePageScrolling();
         const touchEvent = convertTouchToMouseEvent(e);
         handleMouseDown(touchEvent);
         isDragging = true;
@@ -1096,6 +1097,7 @@ function setupEventListeners(canvas) {
         e.preventDefault();
         handleMouseUp(convertTouchToMouseEvent(e));
         isDragging = false;
+        enablePageScrolling();
         displayStatus('Touch end');
     });
 }
@@ -1108,6 +1110,15 @@ function convertTouchToMouseEvent(touchEvent) {
         clientY: touch.clientY,
         button: 0 // Simulate left mouse button
     };
+}
+
+// Utility functions to disable and enable page scrolling
+function disablePageScrolling() {
+    document.body.style.overflow = 'hidden';
+}
+
+function enablePageScrolling() {
+    document.body.style.overflow = 'auto';
 }
 
 // Function to display status messages directly on the canvas for debugging
@@ -1140,4 +1151,3 @@ function drawDragBar(currentX, currentY) {
         ctx.fillRect(dragStartX, dragStartY, width, height);
     }
 }
-
