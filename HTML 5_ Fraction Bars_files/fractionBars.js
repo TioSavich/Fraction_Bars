@@ -839,9 +839,15 @@ function resizeCanvas() {
     }
 }
 
-// Add event listener to handle window resize
-window.addEventListener('resize', resizeCanvas);
-resizeCanvas(); // Initial call to set the correct size
+// Wait for the DOM to fully load before initializing
+window.addEventListener('DOMContentLoaded', function() {
+    const canvas = document.getElementById('fractionBarsCanvas');
+    if (canvas) {
+        setupEventListeners(canvas);
+        resizeCanvas(); // Initial call to set the correct size
+        drawFractionBars();
+    }
+});
 
 // Example function to handle drawing on canvas (updated for touch and responsiveness)
 function drawFractionBars() {
@@ -859,4 +865,3 @@ function drawFractionBars() {
 
 // Redraw whenever the canvas size changes
 window.addEventListener('resize', drawFractionBars);
-drawFractionBars();
