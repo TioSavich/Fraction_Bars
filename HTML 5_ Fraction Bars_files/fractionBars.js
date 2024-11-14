@@ -864,4 +864,10 @@ function drawFractionBars() {
 }
 
 // Redraw whenever the canvas size changes
-window.addEventListener('resize', drawFractionBars);
+window.addEventListener('resize', function() {
+    const canvas = document.getElementById('fractionBarsCanvas');
+    if (canvas) {
+        resizeCanvas();
+        drawFractionBars();
+    }
+});
