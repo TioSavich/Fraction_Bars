@@ -1135,12 +1135,6 @@ function displayStatus(message) {
     }
 }
 
-// Call setupEventListeners on canvas initialization
-const canvas = document.getElementById('fractionBarsCanvas');
-if (canvas) {
-    setupEventListeners(canvas);
-}
-
 // Function to draw a bar based on drag gesture
 function drawDragBar(currentX, currentY) {
     const canvas = document.getElementById('fractionBarsCanvas');
