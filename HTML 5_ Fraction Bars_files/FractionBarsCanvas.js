@@ -1041,29 +1041,57 @@ FractionBarsCanvas.prototype.print_canvas = function (){
   win.location.reload();
 }
 
-// FractionBarsCanvas.js - Updated for iPad compatibility
+// FractionBarsCanvas.js - Updated for iPad compatibility and drag gesture support
 
-// Adding support for touch events
+// Adding support for touch events and dragging functionality
+let isDragging = false;
+let dragStartX = 0;
+let dragStartY = 0;
+
 function setupEventListeners(canvas) {
     // Existing mouse events
-    canvas.addEventListener('mousedown', handleMouseDown);
-    canvas.addEventListener('mousemove', handleMouseMove);
-    canvas.addEventListener('mouseup', handleMouseUp);
+    canvas.addEventListener('mousedown', function(e) {
+        handleMouseDown(e);
+        isDragging = true;
+        dragStartX = e.clientX;
+        dragStartY = e.clientY;
+    });
+    
+    canvas.addEventListener('mousemove', function(e) {
+        if (isDragging) {
+            handleMouseMove(e);
+            drawDragBar(e.clientX, e.clientY);
+        }
+    });
+    
+    canvas.addEventListener('mouseup', function(e) {
+        handleMouseUp(e);
+        isDragging = false;
+    });
     
     // Adding touch events for iPad
     canvas.addEventListener('touchstart', function(e) {
         e.preventDefault();
-        handleMouseDown(convertTouchToMouseEvent(e));
+        const touchEvent = convertTouchToMouseEvent(e);
+        handleMouseDown(touchEvent);
+        isDragging = true;
+        dragStartX = touchEvent.clientX;
+        dragStartY = touchEvent.clientY;
     });
     
     canvas.addEventListener('touchmove', function(e) {
         e.preventDefault();
-        handleMouseMove(convertTouchToMouseEvent(e));
+        if (isDragging) {
+            const touchEvent = convertTouchToMouseEvent(e);
+            handleMouseMove(touchEvent);
+            drawDragBar(touchEvent.clientX, touchEvent.clientY);
+        }
     });
     
     canvas.addEventListener('touchend', function(e) {
         e.preventDefault();
         handleMouseUp(convertTouchToMouseEvent(e));
+        isDragging = false;
     });
 }
 
@@ -1081,4 +1109,18 @@ function convertTouchToMouseEvent(touchEvent) {
 const canvas = document.getElementById('fractionBarsCanvas');
 if (canvas) {
     setupEventListeners(canvas);
+}
+
+// Function to draw a bar based on drag gesture
+function drawDragBar(currentX, currentY) {
+    const ctx = canvas.getContext('2d');
+    if (ctx) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
+        drawFractionBars(); // Redraw existing bars
+        // Draw new bar based on drag start and current position
+        ctx.fillStyle = '#FF5733';
+        const width = currentX - dragStartX;
+        const height = currentY - dragStartY;
+        ctx.fillRect(dragStartX, dragStartY, width, height);
+    }
 }
