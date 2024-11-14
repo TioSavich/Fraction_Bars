@@ -1040,7 +1040,7 @@ FractionBarsCanvas.prototype.print_canvas = function (){
 	win.self.print();
   win.location.reload();
 }
-// FractionBarsCanvas.js - Updated for iPad compatibility and improved drag gesture support with debug
+// FractionBarsCanvas.js - Updated for iPad compatibility and improved drag gesture support with visual feedback
 
 // Adding support for touch events and dragging functionality
 let isDragging = false;
@@ -1054,21 +1054,21 @@ function setupEventListeners(canvas) {
         isDragging = true;
         dragStartX = e.clientX;
         dragStartY = e.clientY;
-        console.log('Mouse down at:', dragStartX, dragStartY);
+        displayStatus('Mouse down at: ' + dragStartX + ', ' + dragStartY);
     });
     
     canvas.addEventListener('mousemove', function(e) {
         if (isDragging) {
             handleMouseMove(e);
             drawDragBar(e.clientX, e.clientY);
-            console.log('Mouse move at:', e.clientX, e.clientY);
+            displayStatus('Mouse move at: ' + e.clientX + ', ' + e.clientY);
         }
     });
     
     canvas.addEventListener('mouseup', function(e) {
         handleMouseUp(e);
         isDragging = false;
-        console.log('Mouse up at:', e.clientX, e.clientY);
+        displayStatus('Mouse up at: ' + e.clientX + ', ' + e.clientY);
     });
     
     // Adding touch events for iPad
@@ -1079,7 +1079,7 @@ function setupEventListeners(canvas) {
         isDragging = true;
         dragStartX = touchEvent.clientX;
         dragStartY = touchEvent.clientY;
-        console.log('Touch start at:', dragStartX, dragStartY);
+        displayStatus('Touch start at: ' + dragStartX + ', ' + dragStartY);
     });
     
     canvas.addEventListener('touchmove', function(e) {
@@ -1088,7 +1088,7 @@ function setupEventListeners(canvas) {
             const touchEvent = convertTouchToMouseEvent(e);
             handleMouseMove(touchEvent);
             drawDragBar(touchEvent.clientX, touchEvent.clientY);
-            console.log('Touch move at:', touchEvent.clientX, touchEvent.clientY);
+            displayStatus('Touch move at: ' + touchEvent.clientX + ', ' + touchEvent.clientY);
         }
     });
     
@@ -1096,7 +1096,7 @@ function setupEventListeners(canvas) {
         e.preventDefault();
         handleMouseUp(convertTouchToMouseEvent(e));
         isDragging = false;
-        console.log('Touch end');
+        displayStatus('Touch end');
     });
 }
 
@@ -1110,6 +1110,17 @@ function convertTouchToMouseEvent(touchEvent) {
     };
 }
 
+// Function to display status messages directly on the canvas for debugging
+function displayStatus(message) {
+    const ctx = canvas.getContext('2d');
+    if (ctx) {
+        ctx.clearRect(0, canvas.height - 30, canvas.width, 30); // Clear the status area
+        ctx.fillStyle = '#000';
+        ctx.font = '16px Arial';
+        ctx.fillText(message, 10, canvas.height - 10);
+    }
+}
+
 // Call setupEventListeners on canvas initialization
 const canvas = document.getElementById('fractionBarsCanvas');
 if (canvas) {
@@ -1120,14 +1131,23 @@ if (canvas) {
 function drawDragBar(currentX, currentY) {
     const ctx = canvas.getContext('2d');
     if (ctx) {
-        ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height - 30); // Clear the canvas except for the status area
         drawFractionBars(); // Redraw existing bars
         // Draw new bar based on drag start and current position
         ctx.fillStyle = '#FF5733';
         const width = currentX - dragStartX;
         const height = currentY - dragStartY;
         ctx.fillRect(dragStartX, dragStartY, width, height);
-        console.log('Drawing bar from:', dragStartX, dragStartY, 'to:', currentX, currentY);
     }
 }
 
+// FractionBars.js - Improvements for responsiveness and touch interaction
+
+// Ensure the canvas resizes appropriately for different screen sizes
+function resizeCanvas() {
+    const canvas = document.getElementById('fractionBarsCanvas');
+    if (canvas) {
+        canvas.width = window.innerWidth * 0.9; // Set width to 90% of screen width
+        canvas.height = window.innerHeight * 0.6; // Set height to 60% of screen height
+    }
+}
