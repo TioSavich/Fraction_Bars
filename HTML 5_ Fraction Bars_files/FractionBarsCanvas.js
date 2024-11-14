@@ -1141,13 +1141,3 @@ function drawDragBar(currentX, currentY) {
     }
 }
 
-// FractionBars.js - Improvements for responsiveness and touch interaction
-
-// Ensure the canvas resizes appropriately for different screen sizes
-function resizeCanvas() {
-    const canvas = document.getElementById('fractionBarsCanvas');
-    if (canvas) {
-        canvas.width = window.innerWidth * 0.9; // Set width to 90% of screen width
-        canvas.height = window.innerHeight * 0.6; // Set height to 60% of screen height
-    }
-}
