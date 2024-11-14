@@ -1123,12 +1123,15 @@ function enablePageScrolling() {
 
 // Function to display status messages directly on the canvas for debugging
 function displayStatus(message) {
-    const ctx = canvas.getContext('2d');
-    if (ctx) {
-        ctx.clearRect(0, canvas.height - 30, canvas.width, 30); // Clear the status area
-        ctx.fillStyle = '#000';
-        ctx.font = '16px Arial';
-        ctx.fillText(message, 10, canvas.height - 10);
+    const canvas = document.getElementById('fractionBarsCanvas');
+    if (canvas) {
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+            ctx.clearRect(0, canvas.height - 30, canvas.width, 30); // Clear the status area
+            ctx.fillStyle = '#000';
+            ctx.font = '16px Arial';
+            ctx.fillText(message, 10, canvas.height - 10);
+        }
     }
 }
 
@@ -1140,14 +1143,17 @@ if (canvas) {
 
 // Function to draw a bar based on drag gesture
 function drawDragBar(currentX, currentY) {
-    const ctx = canvas.getContext('2d');
-    if (ctx) {
-        ctx.clearRect(0, 0, canvas.width, canvas.height - 30); // Clear the canvas except for the status area
-        drawFractionBars(); // Redraw existing bars
-        // Draw new bar based on drag start and current position
-        ctx.fillStyle = '#FF5733';
-        const width = currentX - dragStartX;
-        const height = currentY - dragStartY;
-        ctx.fillRect(dragStartX, dragStartY, width, height);
+    const canvas = document.getElementById('fractionBarsCanvas');
+    if (canvas) {
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height - 30); // Clear the canvas except for the status area
+            drawFractionBars(); // Redraw existing bars
+            // Draw new bar based on drag start and current position
+            ctx.fillStyle = '#FF5733';
+            const width = currentX - dragStartX;
+            const height = currentY - dragStartY;
+            ctx.fillRect(dragStartX, dragStartY, width, height);
+        }
     }
 }
