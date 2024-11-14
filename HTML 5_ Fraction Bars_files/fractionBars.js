@@ -827,6 +827,7 @@ function updateMouseAction(actionName) {
 	$('#mouseAction').text(actionName) ;
 	*/
 }
+
 // FractionBars.js - Improvements for responsiveness and touch interaction
 
 // Ensure the canvas resizes appropriately for different screen sizes
@@ -846,7 +847,7 @@ resizeCanvas(); // Initial call to set the correct size
 function drawFractionBars() {
     const ctx = canvas.getContext('2d');
     if (ctx) {
-        ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height - 30); // Clear the canvas except for the status area
         // Drawing logic here, adjusted for responsive sizing
         ctx.fillStyle = '#FF5733';
         ctx.fillRect(10, 10, canvas.width / 3, canvas.height / 10); // Example bar
@@ -856,3 +857,4 @@ function drawFractionBars() {
 // Redraw whenever the canvas size changes
 window.addEventListener('resize', drawFractionBars);
 drawFractionBars();
+
