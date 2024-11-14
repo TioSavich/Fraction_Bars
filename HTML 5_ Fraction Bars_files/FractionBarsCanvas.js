@@ -1040,8 +1040,7 @@ FractionBarsCanvas.prototype.print_canvas = function (){
 	win.self.print();
   win.location.reload();
 }
-
-// FractionBarsCanvas.js - Updated for iPad compatibility and drag gesture support
+// FractionBarsCanvas.js - Updated for iPad compatibility and improved drag gesture support with debug
 
 // Adding support for touch events and dragging functionality
 let isDragging = false;
@@ -1055,18 +1054,21 @@ function setupEventListeners(canvas) {
         isDragging = true;
         dragStartX = e.clientX;
         dragStartY = e.clientY;
+        console.log('Mouse down at:', dragStartX, dragStartY);
     });
     
     canvas.addEventListener('mousemove', function(e) {
         if (isDragging) {
             handleMouseMove(e);
             drawDragBar(e.clientX, e.clientY);
+            console.log('Mouse move at:', e.clientX, e.clientY);
         }
     });
     
     canvas.addEventListener('mouseup', function(e) {
         handleMouseUp(e);
         isDragging = false;
+        console.log('Mouse up at:', e.clientX, e.clientY);
     });
     
     // Adding touch events for iPad
@@ -1077,6 +1079,7 @@ function setupEventListeners(canvas) {
         isDragging = true;
         dragStartX = touchEvent.clientX;
         dragStartY = touchEvent.clientY;
+        console.log('Touch start at:', dragStartX, dragStartY);
     });
     
     canvas.addEventListener('touchmove', function(e) {
@@ -1085,6 +1088,7 @@ function setupEventListeners(canvas) {
             const touchEvent = convertTouchToMouseEvent(e);
             handleMouseMove(touchEvent);
             drawDragBar(touchEvent.clientX, touchEvent.clientY);
+            console.log('Touch move at:', touchEvent.clientX, touchEvent.clientY);
         }
     });
     
@@ -1092,6 +1096,7 @@ function setupEventListeners(canvas) {
         e.preventDefault();
         handleMouseUp(convertTouchToMouseEvent(e));
         isDragging = false;
+        console.log('Touch end');
     });
 }
 
@@ -1122,5 +1127,7 @@ function drawDragBar(currentX, currentY) {
         const width = currentX - dragStartX;
         const height = currentY - dragStartY;
         ctx.fillRect(dragStartX, dragStartY, width, height);
+        console.log('Drawing bar from:', dragStartX, dragStartY, 'to:', currentX, currentY);
     }
 }
+
