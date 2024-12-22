@@ -62,9 +62,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         splitSlider.noUiSlider.on('update', function (values, handle) {
-            splitWidgetObj.handleSliderChange(values[handle]);
+            splitWidgetObj.handleSliderChange(values); // Pass only the 'values' array
         });
-
+        
         document.getElementById('radio_vert').style.display = 'none';
     }
 
