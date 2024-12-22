@@ -131,7 +131,7 @@ export default class FractionBarsCanvas {
         this.refreshCanvas();
     }
 
-      
+
 
     editLabel() {
         const canvasPos = $('#fbCanvas').position();
