@@ -5,6 +5,7 @@ import Bar from './Bar.js';
 import Mat from './Mat.js';
 import Point from './Point.js';
 
+// Declare global variables at the top of the file
 let point1 = null;
 let point2 = null;
 let fbContext = null;
@@ -15,7 +16,7 @@ let hiddenButtonsName = [];
 let fbCanvasObj = null;
 let file_list = "";
 let file_index = 0;
-let fracEvent = null; // Added missing declaration
+let fracEvent = null; // Correctly declared
 
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -53,6 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
         handleClick(ev.srcEvent);
     });
 
+    // Event listeners for mouse clicks on the canvas
     document.getElementById('fbCanvas').addEventListener('click', function (e) {
         handleClick(e);
     });
@@ -77,238 +79,8 @@ document.addEventListener('DOMContentLoaded', () => {
         handleMouseUp(e.changedTouches[0]);
     }, false);
 
-    // rest of your DOMContentLoaded listener code...
-});
-
-function handleClick(e) {
-    const p = Point.createFromMouseEvent(e, this);
-    if (fbCanvasObj.currentAction === "manualSplit") {
-        fbCanvasObj.manualSplitPoint = p;
-        fbCanvasObj.refreshCanvas();
-    }
-
-    if (fbCanvasObj.mouseDownLoc !== null) {
-        fbCanvasObj.updateCanvas(p);
-    }
-}
-
-function handleMouseDown(e) {
-    fbCanvasObj.check_for_drag = true;
-    fbCanvasObj.cacheUndoState();
-
-    updateMouseLoc(e, this);
-    updateMouseAction('mousedown');
-    fbCanvasObj.mouseDownLoc = Point.createFromMouseEvent(e, this);
-    let b = fbCanvasObj.barClickedOn();
-    let m = fbCanvasObj.matClickedOn();
-
-    if ((fbCanvasObj.currentAction === 'bar') || (fbCanvasObj.currentAction === "mat")) {
-        fbCanvasObj.saveCanvas();
-    } else if (fbCanvasObj.currentAction === 'repeat') {
-        fbCanvasObj.addUndoState();
-        b.repeat(fbCanvasObj.mouseDownLoc);
-        fbCanvasObj.refreshCanvas();
-    } else {
-        if (b !== null) {
-            handleBarClick(b);
-        } else if (m !== null) {
-            handleMatClick(m);
-        } else {
-            fbCanvasObj.clearSelection();
-        }
-        fbCanvasObj.refreshCanvas();
-    }
-}
-
-function handleMouseMove(e) {
-    fracEvent = e;
-    updateMouseLoc(e, this);
-    updateMouseAction('mousemove');
-
-    let p = Point.createFromMouseEvent(e, this);
-
-    if (fbCanvasObj.currentAction == "manualSplit") {
-        fbCanvasObj.manualSplitPoint = p;
-        fbCanvasObj.refreshCanvas();
-    }
-
-    if (fbCanvasObj.mouseDownLoc !== null) {
-        fbCanvasObj.updateCanvas(p);
-    }
-}
-
-function handleMouseUp(e) {
-    updateMouseLoc(e, this);
-    updateMouseAction('mouseup');
-    fbCanvasObj.mouseUpLoc = Point.createFromMouseEvent(e, this);
-
-    if (fbCanvasObj.currentAction === 'bar') {
-        fbCanvasObj.addUndoState();
-        fbCanvasObj.addBar();
-        fbCanvasObj.clear_selection_button();
-    } else if (fbCanvasObj.currentAction === 'mat') {
-        fbCanvasObj.addUndoState();
-        fbCanvasObj.addMat();
-        fbCanvasObj.clear_selection_button();
-    }
-
-    if (fbCanvasObj.found_a_drag) {
-        fbCanvasObj.finalizeCachedUndoState();
-        fbCanvasObj.check_for_drag = false;
-    }
-
-    fbCanvasObj.mouseUpLoc = null;
-    fbCanvasObj.mouseDownLoc = null;
-    fbCanvasObj.mouseLastLoc = null;
-}
-
-    const splitSlider = document.getElementById("split-slider");
-    if (splitSlider) {
-        noUiSlider.create(splitSlider, {
-            start: [2],
-            connect: 'lower',
-            step: 1,
-            range: {
-                'min': [2],
-                'max': [20]
-            },
-            pips: {
-                mode: 'values',
-                values: [2, 4, 6, 8, 10, 12, 14, 16, 18, 20],
-                density: 5
-            }
-        });
-
-        splitSlider.noUiSlider.on('update', function (values, handle) {
-            splitWidgetObj.handleSliderChange(values[handle]);
-        });
-
-        document.getElementById('radio_vert').style.display = 'none';
-    }
-
-    function handleClick(e) {
-        const p = Point.createFromMouseEvent(e, this);
-        if (fbCanvasObj.currentAction === "manualSplit") {
-            fbCanvasObj.manualSplitPoint = p;
-            fbCanvasObj.refreshCanvas();
-        }
-
-        if (fbCanvasObj.mouseDownLoc !== null) {
-            fbCanvasObj.updateCanvas(p);
-        }
-    }
-
-    function handleMouseDown(e) {
-        fbCanvasObj.check_for_drag = true;
-        fbCanvasObj.cacheUndoState();
-
-        updateMouseLoc(e, this);
-        updateMouseAction('mousedown');
-        fbCanvasObj.mouseDownLoc = Point.createFromMouseEvent(e, this);
-        let b = fbCanvasObj.barClickedOn();
-        let m = fbCanvasObj.matClickedOn();
-
-        if ((fbCanvasObj.currentAction === 'bar') || (fbCanvasObj.currentAction === "mat")) {
-            fbCanvasObj.saveCanvas();
-        } else if (fbCanvasObj.currentAction === 'repeat') {
-            fbCanvasObj.addUndoState();
-            b.repeat(fbCanvasObj.mouseDownLoc);
-            fbCanvasObj.refreshCanvas();
-        } else {
-            if (b !== null) {
-                handleBarClick(b);
-            } else if (m !== null) {
-                handleMatClick(m);
-            } else {
-                fbCanvasObj.clearSelection();
-            }
-            fbCanvasObj.refreshCanvas();
-        }
-    }
-
-    function handleMouseMove(e) {
-        fracEvent = e;
-        updateMouseLoc(e, this);
-        updateMouseAction('mousemove');
-
-        let p = Point.createFromMouseEvent(e, this);
-
-        if (fbCanvasObj.currentAction == "manualSplit") {
-            fbCanvasObj.manualSplitPoint = p;
-            fbCanvasObj.refreshCanvas();
-        }
-
-        if (fbCanvasObj.mouseDownLoc !== null) {
-            fbCanvasObj.updateCanvas(p);
-        }
-    }
-
-    function handleMouseUp(e) {
-        updateMouseLoc(e, this);
-        updateMouseAction('mouseup');
-        fbCanvasObj.mouseUpLoc = Point.createFromMouseEvent(e, this);
-
-        if (fbCanvasObj.currentAction === 'bar') {
-            fbCanvasObj.addUndoState();
-            fbCanvasObj.addBar();
-            fbCanvasObj.clear_selection_button();
-        } else if (fbCanvasObj.currentAction === 'mat') {
-            fbCanvasObj.addUndoState();
-            fbCanvasObj.addMat();
-            fbCanvasObj.clear_selection_button();
-        }
-
-        if (fbCanvasObj.found_a_drag) {
-            fbCanvasObj.finalizeCachedUndoState();
-            fbCanvasObj.check_for_drag = false;
-        }
-
-        fbCanvasObj.mouseUpLoc = null;
-        fbCanvasObj.mouseDownLoc = null;
-        fbCanvasObj.mouseLastLoc = null;
-    }
-
-    function handleBarClick(b) {
-        if ($.inArray(b, fbCanvasObj.selectedBars) == -1) {
-            if (!Utilities.shiftKeyDown) {
-                fbCanvasObj.clearSelection();
-            }
-            $.each(fbCanvasObj.selectedBars, function (index, bar) {
-                bar.clearSplitSelection();
-            });
-            fbCanvasObj.barToFront(b);
-            fbCanvasObj.selectedBars.push(b);
-            b.isSelected = true;
-            b.selectSplit(fbCanvasObj.mouseDownLoc);
-        } else {
-            $.each(fbCanvasObj.selectedBars, function (index, bar) {
-                bar.clearSplitSelection();
-            });
-            if (!Utilities.shiftKeyDown) {
-                b.selectSplit(fbCanvasObj.mouseDownLoc);
-            } else {
-                fbCanvasObj.removeBarFromSelection(b);
-            }
-            fbCanvasObj.barToFront(b);
-        }
-        if (fbCanvasObj.currentAction == "manualSplit") {
-            fbCanvasObj.clearSelection();
-        }
-    }
-
-    function handleMatClick(m) {
-        if ($.inArray(m, fbCanvasObj.selectedMats) == -1) {
-            if (!Utilities.shiftKeyDown) {
-                fbCanvasObj.clearSelection();
-            }
-            m.isSelected = true;
-            fbCanvasObj.selectedMats.push(m);
-        } else {
-            if (Utilities.shiftKeyDown) {
-                fbCanvasObj.removeMatFromSelection(m);
-            }
-        }
-    }
+    // The rest of your DOMContentLoaded listener code...
+    // ... (Event listeners for color blocks, actions, etc.)
 
     // Generic input change listener for form elements within the dialog
     $('#dialog-form').on('change', 'input, select', function (event) {
@@ -683,3 +455,51 @@ function updateMouseLoc(e, elem) {
 function updateMouseAction(actionName) {
     // Update mouse action if needed
 }
+
+function handleBarClick(b) {
+    if ($.inArray(b, fbCanvasObj.selectedBars) == -1) {
+        if (!Utilities.shiftKeyDown) {
+            fbCanvasObj.clearSelection();
+        }
+        $.each(fbCanvasObj.selectedBars, function (index, bar) {
+            bar.clearSplitSelection();
+        });
+        fbCanvasObj.barToFront(b);
+        fbCanvasObj.selectedBars.push(b);
+        b.isSelected = true;
+        b.selectSplit(fbCanvasObj.mouseDownLoc);
+    } else {
+        $.each(fbCanvasObj.selectedBars, function (index, bar) {
+            bar.clearSplitSelection();
+        });
+        if (!Utilities.shiftKeyDown) {
+            b.selectSplit(fbCanvasObj.mouseDownLoc);
+        } else {
+            fbCanvasObj.removeBarFromSelection(b);
+        }
+        fbCanvasObj.barToFront(b);
+    }
+    if (fbCanvasObj.currentAction == "manualSplit") {
+        fbCanvasObj.clearSelection();
+    }
+}
+
+function handleMatClick(m) {
+    if ($.inArray(m, fbCanvasObj.selectedMats) == -1) {
+        if (!Utilities.shiftKeyDown) {
+            fbCanvasObj.clearSelection();
+        }
+        m.isSelected = true;
+        fbCanvasObj.selectedMats.push(m);
+    } else {
+        if (Utilities.shiftKeyDown) {
+            fbCanvasObj.removeMatFromSelection(m);
+        }
+    }
+}
+
+// Generic input change listener for form elements within the dialog
+$('#dialog-form').on('change', 'input, select', function(event) {
+    const p = new Point();
+    fbCanvasObj.updateCanvas(p);
+});
