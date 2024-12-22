@@ -83,7 +83,15 @@
 
         <canvas id="fbCanvas" width="700" height="600"></canvas>
         <canvas id="split-display" width="500" height="100"></canvas>
-        <div id="split-slider"></div>
+     <div id="split-slider" class="ui-slider ui-slider-horizontal ui-widget ui-widget-content ui-corner-all" aria-disabled="false"><div class="ui-slider-range ui-widget-header ui-corner-all ui-slider-range-min" style="width: 0%;"></div><span tabindex="0" class="ui-slider-handle ui-state-default ui-corner-all" style="left: 0%;"></span></div>
+    
+            <div id="radio_whole">
+                <label class="c_part_whole" for="whole">Partition whole bar</label>
+                <input type="radio" name="whole_part" id="whole" value="Whole" checked="">
+                <br>
+                <label class="c_part_part" for="part">Partition part of bar</label>
+                <input type="radio" name="whole_part" id="part" value="Part">
+            </div>
 
         <input name="labelField" id="labelInput" type="text" value="">
         <div id="dialog-form" title="Create new user">
