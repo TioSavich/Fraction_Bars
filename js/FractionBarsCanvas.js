@@ -658,4 +658,251 @@ export default class FractionBarsCanvas {
         win.print();
         win.close();
     }
+    updateCanvas(currentMouseLoc) {
+        if ((this.currentAction === 'bar') || (this.currentAction === 'mat')) {
+            if (this.canvasState !== null) {
+                this.context.putImageData(this.canvasState, 0, 0);
+            }
+            if (this.mouseDownLoc !== null) {
+                this.drawRect(this.mouseDownLoc, currentMouseLoc);
+            }
+        } else if (this.currentAction == "manualSplit") {
+            this.manualSplitPoint = currentMouseLoc;
+        } else {
+            // we're dragging stuff around
+            this.drag(currentMouseLoc);
+        }
+    }
+
+    saveCanvas() {
+        this.canvasState = this.context.getImageData(0, 0, 1000, 600);
+    }
+
+    refreshCanvas() {
+        this.context.clearRect(0, 0, 1000, 600);
+        for (let i = 0; i < this.mats.length; i++) {
+            this.drawMat(this.mats[i]);
+        }
+        for (let i = 0; i < this.bars.length; i++) {
+            this.drawBar(this.bars[i]);
+        }
+    }
+
+    setFillColor(fillColor) {
+        this.currentFill = fillColor;
+        this.context.fillStyle = this.currentFill;
+    }
+
+    
+    clear_selection_button() {
+        this.clearMouse();
+        this.clearSelection();
+        $("[id^='tool_']").removeClass('toolSelected');
+        this.currentAction = '';
+    }
+
+    cacheUndoState() {
+        this.CachedState = new CanvasState(this);
+        this.CachedState.grabBarsAndMats();
+    }
+
+    finalizeCachedUndoState() {
+        if (this.CachedState !== null) {
+            this.mUndoArray.push(this.CachedState);  // Push new state onto the stack
+            while (this.mUndoArray.length > 100) {
+                this.mUndoArray.shift();  // Shift states off the bottom of the undo stack
+            }
+            this.mRedoArray = []; // When an undoable event happens, it clears the redo stack.
+        }
+        this.check_for_drag = false;
+        this.found_a_drag = false;
+    }
+
+    undo() {
+        if (this.mUndoArray.length > 0) {
+            const newState = new CanvasState(this);
+            newState.grabBarsAndMats();
+            this.mRedoArray.push(newState);
+            this.restoreAState(this.mUndoArray.pop());
+        }
+    }
+
+    redo() {
+        if (this.mRedoArray.length > 0) {
+            const newState = new CanvasState(this);
+            newState.grabBarsAndMats();
+            this.mUndoArray.push(newState);
+            this.restoreAState(this.mRedoArray.pop());
+        }
+    }
+
+    restoreAState(a_new_state) {
+        this.bars = [];
+        this.mats = [];
+        this.selectedBars = [];
+        this.selectedMats = [];
+
+        while (a_new_state.mBars.length > 0) {
+            let temp_bar = a_new_state.mBars.shift();
+            this.bars.push(temp_bar);
+        }
+
+        while (a_new_state.mMats.length > 0) {
+            this.mats.push(a_new_state.mMats.shift());
+        }
+
+        this.unitBar = a_new_state.mUnitBar;
+        if (this.unitBar !== null) {
+            this.unitBar.isUnitBar = true;
+            this.unitBar.fraction = '1/1';
+        }
+        this.clearSelection();
+    }
+
+    save() {
+        const newState = new CanvasState(this);
+        newState.grabBarsAndMats();
+        newState.mFBCanvas = null;
+        const state_string = JSON.stringify(JSON.decycle(newState));
+    
+        const file = new Blob([state_string], { type: 'application/json' });
+    
+        // Create a link and set the filename
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(file);
+        link.download = 'fraction_bars_state.json';
+    
+        // Append the link, click it to start download, and then remove it
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    openFileDialog() {
+        const fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.accept = '.json';
+        fileInput.style.display = 'none';
+    
+        document.body.appendChild(fileInput);
+    
+        fileInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+    
+                reader.onload = (e) => {
+                    try {
+                        const file_contents = e.target.result;
+                        const parsedData = JSON.retrocycle(JSON.parse(file_contents));
+                        this.restoreBarsAndMatsFromJSON(parsedData);
+                    } catch (error) {
+                        console.error("Error parsing JSON data:", error);
+                        alert("Failed to load the selected file.");
+                    }
+                };
+    
+                reader.onerror = (error) => {
+                    console.error("Error reading file:", error);
+                    alert("Failed to read the selected file.");
+                };
+    
+                reader.readAsText(file);
+            }
+    
+            document.body.removeChild(fileInput);
+        });
+    
+        fileInput.click();
+    }
+
+    print_canvas() {
+        const canvas = document.getElementById("fbCanvas");
+        const win = window.open();
+        win.document.write("<html><br><img src='" + canvas.toDataURL() + "'/></html>");
+        win.document.close();
+        win.focus();
+        win.print();
+        win.close();
+    }
+
+    restoreBarsAndMatsFromJSON(JSON_obj) {
+        this.bars = [];
+        this.mats = [];
+        this.selectedBars = [];
+        this.selectedMats = [];
+        this.unitBar = null;
+        let len = 0;
+    
+        if (JSON_obj.mBars.length > 0) {
+            for (let i = 0; i < JSON_obj.mBars.length; i++) {
+                len = this.bars.push(Bar.copyFromJSON(JSON_obj.mBars[i]));
+                if (this.bars[len - 1].isUnitBar) {
+                    this.unitBar = this.bars[len - 1];
+                    this.unitBar.fraction = "1/1";
+                }
+            }
+        }
+        if (JSON_obj.mMats.length > 0) {
+            for (let j = 0; j < JSON_obj.mMats.length; j++) {
+                this.mats.push(Mat.copyFromJSON(JSON_obj.mMats[j]));
+            }
+        }
+    
+        this.hiddenButtonsName = JSON_obj.mHidden.slice(0);
+        for (let ii = 0; ii < this.hiddenButtonsName.length; ii++) {
+            if (hiddenButtonsName.indexOf(this.hiddenButtonsName[ii]) < 0) {
+                const hidden = document.getElementById(this.hiddenButtonsName[ii]);
+    
+                $(hidden).hide();
+                hiddenButtonsName.push(this.hiddenButtonsName[ii]);
+                hiddenButtons.push($(hidden));
+            }
+        }
+    
+        this.clearSelection();
+        this.refreshCanvas();
+    }
+
+    handleFileEvent(file_event) {
+        const file_contents = file_event.target.result;    
+        let text_state = "";
+        let something = null;
+    
+        try {
+            text_state = file_contents.replace(/(\r\n|\n|\r)/gm, "");
+            something = JSON.retrocycle(JSON.parse(text_state));
+        } catch (e) {
+            alert("An error has occurred. \n\n" + "Fraction Bars cannot open this file. \n\n" + e.message);
+            return;
+        }
+        this.restoreBarsAndMatsFromJSON(something);
+    }
+
+    drag(currentLoc) {
+        if (!this.mouseLastLoc) {
+            this.mouseLastLoc = this.mouseDownLoc;
+        }
+    
+        const dx = currentLoc.x - this.mouseLastLoc.x;
+        const dy = currentLoc.y - this.mouseLastLoc.y;
+    
+        this.selectedBars.forEach(bar => {
+            bar.x += dx;
+            bar.y += dy;
+        });
+    
+        this.selectedMats.forEach(mat => {
+            mat.x += dx;
+            mat.y += dy;
+        });
+    
+        if (this.check_for_drag) {
+            this.found_a_drag = true;
+            this.check_for_drag = false;
+        }
+    
+        this.mouseLastLoc = currentLoc;
+        this.refreshCanvas();
+    }
 }
