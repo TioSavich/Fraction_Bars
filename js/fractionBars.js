@@ -18,7 +18,7 @@ let file_index = 0;
 let fracEvent = null; // Added missing declaration
 
 document.addEventListener('DOMContentLoaded', () => {
-    
+
     // Wait for the canvas element to be available
     const waitForCanvas = setInterval(() => {
         const fbCanvas = document.getElementById('fbCanvas');
@@ -52,6 +52,115 @@ document.addEventListener('DOMContentLoaded', () => {
     hammertime.on('tap', function (ev) {
         handleClick(ev.srcEvent);
     });
+
+    document.getElementById('fbCanvas').addEventListener('click', function (e) {
+        handleClick(e);
+    });
+
+    document.getElementById('fbCanvas').addEventListener('mousedown', function(e) {
+        handleMouseDown(e);
+    });
+    
+    document.getElementById('fbCanvas').addEventListener('mouseup', function(e) {
+        handleMouseUp(e);
+    });
+    
+    // Touch event listeners
+    document.getElementById('fbCanvas').addEventListener('touchstart', function(e) {
+        // Prevent the default behavior to avoid double-triggering with mouse events
+        e.preventDefault();
+        handleMouseDown(e.changedTouches[0]);
+    }, false);
+    
+    document.getElementById('fbCanvas').addEventListener('touchend', function(e) {
+        e.preventDefault();
+        handleMouseUp(e.changedTouches[0]);
+    }, false);
+
+    // rest of your DOMContentLoaded listener code...
+});
+
+function handleClick(e) {
+    const p = Point.createFromMouseEvent(e, this);
+    if (fbCanvasObj.currentAction === "manualSplit") {
+        fbCanvasObj.manualSplitPoint = p;
+        fbCanvasObj.refreshCanvas();
+    }
+
+    if (fbCanvasObj.mouseDownLoc !== null) {
+        fbCanvasObj.updateCanvas(p);
+    }
+}
+
+function handleMouseDown(e) {
+    fbCanvasObj.check_for_drag = true;
+    fbCanvasObj.cacheUndoState();
+
+    updateMouseLoc(e, this);
+    updateMouseAction('mousedown');
+    fbCanvasObj.mouseDownLoc = Point.createFromMouseEvent(e, this);
+    let b = fbCanvasObj.barClickedOn();
+    let m = fbCanvasObj.matClickedOn();
+
+    if ((fbCanvasObj.currentAction === 'bar') || (fbCanvasObj.currentAction === "mat")) {
+        fbCanvasObj.saveCanvas();
+    } else if (fbCanvasObj.currentAction === 'repeat') {
+        fbCanvasObj.addUndoState();
+        b.repeat(fbCanvasObj.mouseDownLoc);
+        fbCanvasObj.refreshCanvas();
+    } else {
+        if (b !== null) {
+            handleBarClick(b);
+        } else if (m !== null) {
+            handleMatClick(m);
+        } else {
+            fbCanvasObj.clearSelection();
+        }
+        fbCanvasObj.refreshCanvas();
+    }
+}
+
+function handleMouseMove(e) {
+    fracEvent = e;
+    updateMouseLoc(e, this);
+    updateMouseAction('mousemove');
+
+    let p = Point.createFromMouseEvent(e, this);
+
+    if (fbCanvasObj.currentAction == "manualSplit") {
+        fbCanvasObj.manualSplitPoint = p;
+        fbCanvasObj.refreshCanvas();
+    }
+
+    if (fbCanvasObj.mouseDownLoc !== null) {
+        fbCanvasObj.updateCanvas(p);
+    }
+}
+
+function handleMouseUp(e) {
+    updateMouseLoc(e, this);
+    updateMouseAction('mouseup');
+    fbCanvasObj.mouseUpLoc = Point.createFromMouseEvent(e, this);
+
+    if (fbCanvasObj.currentAction === 'bar') {
+        fbCanvasObj.addUndoState();
+        fbCanvasObj.addBar();
+        fbCanvasObj.clear_selection_button();
+    } else if (fbCanvasObj.currentAction === 'mat') {
+        fbCanvasObj.addUndoState();
+        fbCanvasObj.addMat();
+        fbCanvasObj.clear_selection_button();
+    }
+
+    if (fbCanvasObj.found_a_drag) {
+        fbCanvasObj.finalizeCachedUndoState();
+        fbCanvasObj.check_for_drag = false;
+    }
+
+    fbCanvasObj.mouseUpLoc = null;
+    fbCanvasObj.mouseDownLoc = null;
+    fbCanvasObj.mouseLastLoc = null;
+}
 
     const splitSlider = document.getElementById("split-slider");
     if (splitSlider) {
