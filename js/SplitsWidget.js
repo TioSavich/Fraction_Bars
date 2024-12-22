@@ -7,8 +7,8 @@ export default class SplitsWidget {
         this.color = "yellow";
     }
 
-    handleSliderChange(event, ui) {
-        this.num_splits = ui.value;
+    handleSliderChange(values) {
+        this.num_splits = Number(values[0]); // Access the first element and convert to a number
         this.refreshCanvas();
     }
 
