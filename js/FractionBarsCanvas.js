@@ -131,7 +131,7 @@ export default class FractionBarsCanvas {
         this.refreshCanvas();
     }
 
-        // ... (previous methods from the last response)
+      
 
     editLabel() {
         const canvasPos = $('#fbCanvas').position();
@@ -351,7 +351,7 @@ export default class FractionBarsCanvas {
         this.context.strokeRect(p.x + 0.5, p.y + 0.5, w, h);
     }
 
-   // ... (previous methods from last two responses)
+// ... (previous methods from last two responses)
     drawBar(b) {
         this.context.fillStyle = b.color;
         this.context.fillRect(b.x + 0.5, b.y + 0.5, b.w, b.h);
