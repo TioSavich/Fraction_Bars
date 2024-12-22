@@ -15,12 +15,21 @@ let hiddenButtonsName = [];
 let fbCanvasObj = null;
 let file_list = "";
 let file_index = 0;
+let fracEvent = null; // Added missing declaration
 
 document.addEventListener('DOMContentLoaded', () => {
-    fbContext = document.getElementById('fbCanvas').getContext('2d');
-    fbCanvasObj = new FractionBarsCanvas(fbContext);
-    splitWidgetContext = document.getElementById('split-display').getContext('2d');
-    splitWidgetObj = new SplitsWidget(splitWidgetContext);
+    
+    // Wait for the canvas element to be available
+    const waitForCanvas = setInterval(() => {
+        const fbCanvas = document.getElementById('fbCanvas');
+        if (fbCanvas) {
+            clearInterval(waitForCanvas);
+            fbContext = fbCanvas.getContext('2d');
+            fbCanvasObj = new FractionBarsCanvas(fbContext);
+            splitWidgetContext = document.getElementById('split-display').getContext('2d');
+            splitWidgetObj = new SplitsWidget(splitWidgetContext);
+        }
+    }, 10); // Check every 10 milliseconds
 
     // Initialize Hammer.js for gesture support
     const hammertime = new Hammer(document.getElementById('fbCanvas'));
@@ -62,9 +71,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         splitSlider.noUiSlider.on('update', function (values, handle) {
-            splitWidgetObj.handleSliderChange(values); // Pass only the 'values' array
+            splitWidgetObj.handleSliderChange(values[handle]);
         });
-        
+
         document.getElementById('radio_vert').style.display = 'none';
     }
 
@@ -74,22 +83,22 @@ document.addEventListener('DOMContentLoaded', () => {
             fbCanvasObj.manualSplitPoint = p;
             fbCanvasObj.refreshCanvas();
         }
-    
+
         if (fbCanvasObj.mouseDownLoc !== null) {
             fbCanvasObj.updateCanvas(p);
         }
     }
-    
+
     function handleMouseDown(e) {
         fbCanvasObj.check_for_drag = true;
         fbCanvasObj.cacheUndoState();
-    
+
         updateMouseLoc(e, this);
         updateMouseAction('mousedown');
         fbCanvasObj.mouseDownLoc = Point.createFromMouseEvent(e, this);
         let b = fbCanvasObj.barClickedOn();
         let m = fbCanvasObj.matClickedOn();
-    
+
         if ((fbCanvasObj.currentAction === 'bar') || (fbCanvasObj.currentAction === "mat")) {
             fbCanvasObj.saveCanvas();
         } else if (fbCanvasObj.currentAction === 'repeat') {
@@ -107,30 +116,29 @@ document.addEventListener('DOMContentLoaded', () => {
             fbCanvasObj.refreshCanvas();
         }
     }
-    
+
     function handleMouseMove(e) {
         fracEvent = e;
         updateMouseLoc(e, this);
         updateMouseAction('mousemove');
-    
-        let p = Point.createFromMouseEvent(e, this) ;
-    
+
+        let p = Point.createFromMouseEvent(e, this);
+
         if (fbCanvasObj.currentAction == "manualSplit") {
             fbCanvasObj.manualSplitPoint = p;
             fbCanvasObj.refreshCanvas();
         }
-    
-        if(fbCanvasObj.mouseDownLoc !== null) {
+
+        if (fbCanvasObj.mouseDownLoc !== null) {
             fbCanvasObj.updateCanvas(p);
         }
     }
-    
-    
+
     function handleMouseUp(e) {
         updateMouseLoc(e, this);
         updateMouseAction('mouseup');
         fbCanvasObj.mouseUpLoc = Point.createFromMouseEvent(e, this);
-    
+
         if (fbCanvasObj.currentAction === 'bar') {
             fbCanvasObj.addUndoState();
             fbCanvasObj.addBar();
@@ -140,18 +148,17 @@ document.addEventListener('DOMContentLoaded', () => {
             fbCanvasObj.addMat();
             fbCanvasObj.clear_selection_button();
         }
-    
+
         if (fbCanvasObj.found_a_drag) {
             fbCanvasObj.finalizeCachedUndoState();
             fbCanvasObj.check_for_drag = false;
         }
-    
+
         fbCanvasObj.mouseUpLoc = null;
         fbCanvasObj.mouseDownLoc = null;
         fbCanvasObj.mouseLastLoc = null;
     }
-    
-    
+
     function handleBarClick(b) {
         if ($.inArray(b, fbCanvasObj.selectedBars) == -1) {
             if (!Utilities.shiftKeyDown) {
@@ -179,7 +186,7 @@ document.addEventListener('DOMContentLoaded', () => {
             fbCanvasObj.clearSelection();
         }
     }
-    
+
     function handleMatClick(m) {
         if ($.inArray(m, fbCanvasObj.selectedMats) == -1) {
             if (!Utilities.shiftKeyDown) {
