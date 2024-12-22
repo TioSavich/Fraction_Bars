@@ -19,71 +19,93 @@
         }
     </style>
 </head>
-<body>
+   <body>
     <h1 class="bar_titles" id="bar_titles">Fraction Bars</h1>
 
     <div id="main">
         <div id="tools">
             <div class="toolGroup">
-                <a class="c_bar" id="tool_bar"> </a>
-                <a class="c_mat" id="tool_mat"> </a>
+                <a class="c_bar" id="tool_bar"> </a>
+                <a class="c_mat" id="tool_mat"> </a>
              </div>
             <div class="toolGroup">
-                <a class="c_copy" id="action_copy"> </a>
-                <a class="c_repeat" id="tool_repeat"> </a>
-                <a class="c_iterate" id="window_iterate"> </a>
-                <a class="c_join" id="action_join"> </a>
-                <a class="c_delete" id="action_delete"> </a>
+                <a class="c_copy" id="action_copy"> </a>
+                <a class="c_repeat" id="tool_repeat"> </a>
+                <a class="c_iterate" id="window_iterate"> </a>
+                <a class="c_join" id="action_join"> </a>
+                <a class="c_delete" id="action_delete"> </a>
             </div>
             <div class="toolGroup">
-                <a class="c_parts" id="window_split"> </a>
-                <a class="c_pieces" id="tool_manualSplit"> </a>
-                <a class="c_b_apart" id="action_breakApart"> </a>
-                <a class="c_pullout" id="action_pullOutSplit"> </a>
-                <a class="c_c_parts" id="action_clearSplits"> </a>
+                <a class="c_parts" id="window_split"> </a>
+                <a class="c_pieces" id="tool_manualSplit"> </a>
+                <a class="c_b_apart" id="action_breakApart"> </a>
+                <a class="c_pullout" id="action_pullOutSplit"> </a>
+                <a class="c_c_parts" id="action_clearSplits"> </a>
             </div>
             <div class="toolGroup">
-                <a class="c_set_unit" id="action_setUnitBar"> </a>
-                <a class="c_measure" id="action_measure"> </a>
+                <a class="c_set_unit" id="action_setUnitBar"> </a>
+                <a class="c_measure" id="action_measure"> </a>
                 <a class="c_make" id="action_make">Make</a>
-                <a class="c_label" id="window_label"> </a>
+                <a class="c_label" id="window_label"> </a>
             </div>
             <div class="toolGroup">
                 <a class="c_undo" id="action_undo"></a>
-                <a class="c_redo" id="action_redo"> </a>
-                <a class="c_save" id="action_save"> </a>
-                <a class="c_open" id="action_open"> </a>
-                <a class="c_new" id="action_clearAll"> </a>
-                <a class="c_print" id="action_print"> </a>
-                <a class="c_properties" id="window_properties"> </a>
+                <a class="c_redo" id="action_redo"> </a>
+                <a class="c_save" id="action_save"> </a>
+                <a class="c_open" id="action_open"> </a>
+                <a class="c_new" id="action_clearAll"> </a>
+                <a class="c_print" id="action_print"> </a>
+                <a class="c_properties" id="window_properties"> </a>
             </div>
             <div class="toolGroup" style="text-align:center">
-                <a class="colorBlock color10 colorSelected" id="setColor1"> </a>
-                <a class="colorBlock color3" id="setColor2"> </a>
-                <a class="colorBlock color7" id="setColor3"> </a>
-                <a class="colorBlock color5" id="setColor4"> </a>
-                <a class="colorBlock color12" id="setColor5"> </a>
-                <a class="colorBlock color9" id="setColor6"> </a>
-                <a class="colorBlock color13" id="setColor7"> </a>
-                <a class="colorBlock color14" id="setColor8"> </a>
+                <a class="colorBlock color10 colorSelected" id="setColor1"> </a>
+                <a class="colorBlock color3" id="setColor2"> </a>
+                <a class="colorBlock color7" id="setColor3"> </a>
+                <a class="colorBlock color5" id="setColor4"> </a>
+                <a class="colorBlock color12" id="setColor5"> </a>
+                <a class="colorBlock color9" id="setColor6"> </a>
+                <a class="colorBlock color13" id="setColor7"> </a>
+                <a class="colorBlock color14" id="setColor8"> </a>
             </div>
-            <div class="toolGroup" style="text-align:center"> 
+            <div class="toolGroup" style="text-align:center"> 
                 <select class="c_filetext" id="id_filetext" multiple="multiple" style="display: none;"></select>
-                <a class="c_previous" id="action_previous" style="display: none;"> </a>
-                <a class="c_next" id="action_next" style="display: none;"> </a>
+                <a class="c_previous" id="action_previous" style="display: none;"> </a>
+                <a class="c_next" id="action_next" style="display: none;"> </a>
             </div>
             <div class="toolGroup" style="text-align:center">
-                <a class="hideShow c_hide" id="tool_hide"> </a>
-                <a class="hideShow c_show" id="action_show"> </a>
+                <a class="hideShow c_hide" id="tool_hide"> </a>
+                <a class="hideShow c_show" id="action_show"> </a>
             </div>
         </div>
         <div hidden="" id="flags">
-            <a id="marked-iterate" data-flag="true"> </a>
+            <a id="marked-iterate" data-flag="true"> </a>
         </div>
 
         <canvas id="fbCanvas" width="700" height="600"></canvas>
-        <canvas id="split-display" width="500" height="100"></canvas>
-     <div id="split-slider" class="ui-slider ui-slider-horizontal ui-widget ui-widget-content ui-corner-all" aria-disabled="false"><div class="ui-slider-range ui-widget-header ui-corner-all ui-slider-range-min" style="width: 0%;"></div><span tabindex="0" class="ui-slider-handle ui-state-default ui-corner-all" style="left: 0%;"></span></div>
+
+        <input name="labelField" id="labelInput" type="text" value="">
+        <div id="dialog-form" title="Create new user">
+        </div>
+    </div>
+    <div id="dialog-form" title="Create new user" style="display: none;">
+        <div class="ui-dialog-content ui-widget-content" id="dialog-splits" style="width: auto; min-height: 44.8px; max-height: none; height: auto;">
+    
+            <p>
+                <canvas id="split-display" width="100" height="100"></canvas>
+            </p>
+            <div class="radio_vert_horz" id="radio_vert">
+                <label class="c_vertical" for="vert">Vertical</label>
+                <input type="radio" name="vert_horiz" id="vert" value="Vertical" checked="">
+                <label class="c_horizontal" for="horiz">Horizontal</label>
+                <input type="radio" name="vert_horiz" id="horiz" value="Horizontal">
+            </div>
+    
+            <p>
+                <label class="c_number_part" for="split-slider-field">Number of parts:</label>
+                <input type="text" id="split-slider-field" style="border:0; color:#f6931f; font-weight:bold;" value="2" readonly="">
+            </p>
+    
+            <div id="split-slider" class="ui-slider ui-slider-horizontal ui-widget ui-widget-content ui-corner-all" aria-disabled="false"><div class="ui-slider-range ui-widget-header ui-corner-all ui-slider-range-min" style="width: 0%;"></div><span tabindex="0" class="ui-slider-handle ui-state-default ui-corner-all" style="left: 0%;"></span></div>
     
             <div id="radio_whole">
                 <label class="c_part_whole" for="whole">Partition whole bar</label>
@@ -92,11 +114,10 @@
                 <label class="c_part_part" for="part">Partition part of bar</label>
                 <input type="radio" name="whole_part" id="part" value="Part">
             </div>
-
-        <input name="labelField" id="labelInput" type="text" value="">
-        <div id="dialog-form" title="Create new user">
+    
         </div>
     </div>
+
 
     <script src="js/Point.js" type="module"></script>
     <script src="js/Bar.js" type="module"></script>
