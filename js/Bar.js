@@ -349,6 +349,11 @@ export default class Bar {
     }
 
     join(b) {
+        if (!b) {
+            alert("No bar provided for Join function");
+            return false;
+        }
+
         const gap = Bar.distanceBetween(this, b);
         gap.x = Math.abs(gap.x);
         gap.y = Math.abs(gap.y);
