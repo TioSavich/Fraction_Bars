@@ -2,8 +2,7 @@ import Bar from './Bar.js';
 import Mat from './Mat.js';
 
 export default class CanvasState {
-    constructor(FBCanvas) {
-        this.mFBCanvas = FBCanvas;
+    constructor() {
         this.canvasState = null;
 
         this.mBars = [];
@@ -12,28 +11,28 @@ export default class CanvasState {
         this.mHidden = [];
     }
 
-    grabBarsAndMats() {
+    grabBarsAndMats(fractionBarsCanvas) {
         let aBar = null;
 
-        for (let i = 0; i < this.mFBCanvas.bars.length; i++) {
-            aBar = this.mFBCanvas.bars[i].copy(false);
+        for (let i = 0; i < fractionBarsCanvas.bars.length; i++) {
+            aBar = fractionBarsCanvas.bars[i].copy(false);
             this.mBars.push(aBar);
-            if (this.mFBCanvas.bars[i] === this.mFBCanvas.unitBar) {
+            if (fractionBarsCanvas.bars[i] === fractionBarsCanvas.unitBar) {
                 this.mUnitBar = aBar;
             }
-            if (this.mFBCanvas.bars[i].isSelected) {
+            if (fractionBarsCanvas.bars[i].isSelected) {
                 aBar.isSelected = true;
             } else {
                 aBar.isSelected = false;
             }
-            if (this.mFBCanvas.bars[i].isUnitBar) {
+            if (fractionBarsCanvas.bars[i].isUnitBar) {
                 aBar.isUnitBar = true;
             }
         }
 
-        for (let j = 0; j < this.mFBCanvas.mats.length; j++) {
-            this.mMats.push(this.mFBCanvas.mats[j].copy(false));
+        for (let j = 0; j < fractionBarsCanvas.mats.length; j++) {
+            this.mMats.push(fractionBarsCanvas.mats[j].copy(false));
         }
-        this.mHidden = [...this.mFBCanvas.hiddenButtonsName];
+        this.mHidden = [...fractionBarsCanvas.hiddenButtonsName];
     }
 }
