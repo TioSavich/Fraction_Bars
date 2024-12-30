@@ -5,501 +5,575 @@ import Bar from './Bar.js';
 import Mat from './Mat.js';
 import Point from './Point.js';
 
-// Declare global variables at the top of the file
-let point1 = null;
-let point2 = null;
-let fbContext = null;
-let splitWidgetContext = null;
-let splitWidgetObj = null;
-let hiddenButtons = [];
-let hiddenButtonsName = [];
-let fbCanvasObj = null;
-let file_list = "";
-let file_index = 0;
-let fracEvent = null; // Correctly declared
+export default class FractionBars {
+    constructor() {
+        this.fbContext = null;
+        this.splitWidgetContext = null;
+        this.splitWidgetObj = null;
+        this.hiddenButtons = [];
+        this.hiddenButtonsName = [];
+        this.fbCanvasObj = null;
+        this.file_list = "";
+        this.file_index = 0;
+        this.fracEvent = null;
+    }
 
-document.addEventListener('DOMContentLoaded', () => {
-
-    // Wait for the canvas element to be available
-    const waitForCanvas = setInterval(() => {
+    init(){
         const fbCanvas = document.getElementById('fbCanvas');
-        if (fbCanvas) {
-            clearInterval(waitForCanvas);
-            fbContext = fbCanvas.getContext('2d');
-            fbCanvasObj = new FractionBarsCanvas(fbContext);
-            splitWidgetContext = document.getElementById('split-display').getContext('2d');
-            splitWidgetObj = new SplitsWidget(splitWidgetContext);
-        }
-    }, 10); // Check every 10 milliseconds
+            if (fbCanvas) {
+                this.fbContext = fbCanvas.getContext('2d');
+                this.fbCanvasObj = new FractionBarsCanvas(this.fbContext);
+                this.splitWidgetContext = document.getElementById('split-display').getContext('2d');
+                this.splitWidgetObj = new SplitsWidget(this.splitWidgetContext);
 
-    // Initialize Hammer.js for gesture support
-    const hammertime = new Hammer(document.getElementById('fbCanvas'));
-    hammertime.get('pan').set({ direction: Hammer.DIRECTION_ALL });
+                // Initialize Hammer.js for gesture support
+                const hammertime = new Hammer(document.getElementById('fbCanvas'));
+                hammertime.get('pan').set({ direction: Hammer.DIRECTION_ALL });
 
-    // Handle panning/dragging with Hammer.js
-    hammertime.on('panstart', function (ev) {
-        handleMouseDown(ev.srcEvent);
-    });
+                // Handle panning/dragging with Hammer.js
+                hammertime.on('panstart', (ev) => {
+                    this.handleMouseDown(ev.srcEvent);
+                });
 
-    hammertime.on('panmove', function (ev) {
-        handleMouseMove(ev.srcEvent);
-    });
+                hammertime.on('panmove', (ev) => {
+                    this.handleMouseMove(ev.srcEvent);
+                });
 
-    hammertime.on('panend', function (ev) {
-        handleMouseUp(ev.srcEvent);
-    });
+                hammertime.on('panend', (ev) => {
+                    this.handleMouseUp(ev.srcEvent);
+                });
 
-    // Handle tap as click
-    hammertime.on('tap', function (ev) {
-        handleClick(ev.srcEvent);
-    });
+                // Handle tap as click
+                hammertime.on('tap', (ev) => {
+                     this.handleClick(ev.srcEvent);
+                });
 
-    // Event listeners for mouse clicks on the canvas
-    document.getElementById('fbCanvas').addEventListener('click', function (e) {
-        handleClick(e);
-    });
+                // Event listeners for mouse clicks on the canvas
+                document.getElementById('fbCanvas').addEventListener('click', (e) => {
+                    this.handleClick(e);
+                });
 
-    document.getElementById('fbCanvas').addEventListener('mousedown', function(e) {
-        handleMouseDown(e);
-    });
+                document.getElementById('fbCanvas').addEventListener('mousedown', (e) => {
+                    this.handleMouseDown(e);
+                });
+
+                document.getElementById('fbCanvas').addEventListener('mouseup', (e) => {
+                    this.handleMouseUp(e);
+                });
+
+                // Touch event listeners
+                document.getElementById('fbCanvas').addEventListener('touchstart', (e) => {
+                    // Prevent the default behavior to avoid double-triggering with mouse events
+                    e.preventDefault();
+                     this.handleMouseDown(e.changedTouches[0]);
+                }, false);
+
+                document.getElementById('fbCanvas').addEventListener('touchend', (e) => {
+                    e.preventDefault();
+                    this.handleMouseUp(e.changedTouches[0]);
+                }, false);
+
+                 // Generic input change listener for form elements within the dialog
+                 $('#dialog-form').on('change', 'input, select', (event) => {
+                   const p = new Point();
+                   this.fbCanvasObj.updateCanvas(p);
+                 });
+
+                 document.querySelectorAll('.colorBlock').forEach(block => {
+                     block.addEventListener('click', (e) => {
+                        this.fbCanvasObj.setFillColor(this.style.backgroundColor);
+                        document.querySelectorAll('.colorBlock').forEach(b => b.classList.remove('colorSelected'));
+                        this.classList.add('colorSelected');
+                        this.fbCanvasObj.updateColorsOfSelectedBars();
+                        this.fbCanvasObj.refreshCanvas();
+                   });
+               });
+
+               document.querySelectorAll('.colorBlock1').forEach(block => {
+                   block.addEventListener('click', (e) => {
+                       document.getElementById('fbCanvas').style.backgroundColor = this.style.backgroundColor;
+                        document.querySelectorAll('.colorBlock1').forEach(b => b.classList.remove('colorSelected'));
+                       this.classList.add('colorSelected');
+                  });
+              });
+        
+               document.querySelectorAll('a').forEach(link => {
+                     link.addEventListener('click', (e) => {
+                          this.handleActionClick(this.id);
+                      });
+              });
+
+
+               document.addEventListener('keydown', (e) => {
+                     if (e.which === 16) {
+                         Utilities.shiftKeyDown = true;
+                         this.fbCanvasObj.refreshCanvas();
+                     }
     
-    document.getElementById('fbCanvas').addEventListener('mouseup', function(e) {
-        handleMouseUp(e);
-    });
+                    if (e.ctrlKey && e.keyCode == 80) {
+                        this.fbCanvasObj.properties();
+                         this.fbCanvasObj.refreshCanvas();
+                    }
     
-    // Touch event listeners
-    document.getElementById('fbCanvas').addEventListener('touchstart', function(e) {
-        // Prevent the default behavior to avoid double-triggering with mouse events
-        e.preventDefault();
-        handleMouseDown(e.changedTouches[0]);
-    }, false);
+                    if (e.ctrlKey && e.keyCode == 83) {
+                         this.fbCanvasObj.save();
+                         this.fbCanvasObj.refreshCanvas();
+                    }
     
-    document.getElementById('fbCanvas').addEventListener('touchend', function(e) {
-        e.preventDefault();
-        handleMouseUp(e.changedTouches[0]);
-    }, false);
+                    if (e.ctrlKey && e.keyCode == 72) {
+                         if (Utilities.ctrlKeyDown) {
+                             this.showButton("tool_hide");
+                             this.showButton("action_show");
+                             Utilities.ctrlKeyDown = false;
+                        } else {
+                             Utilities.ctrlKeyDown = true;
+                             this.hideButton("tool_hide");
+                             this.hideButton("action_show");
+                        }
+                         this.fbCanvasObj.clear_selection_button();
+                         this.fbCanvasObj.refreshCanvas();
+                     }
+    
+                     if (e.ctrlKey && e.keyCode == 46) {
+                         this.fbCanvasObj.addUndoState();
+                         this.fbCanvasObj.deleteSelectedBars();
+                         this.fbCanvasObj.refreshCanvas();
+                     }
+                });
+    
+               document.addEventListener('keyup', (e) => {
+                     if (e.which === 16) {
+                         Utilities.shiftKeyDown = false;
+                         this.fbCanvasObj.refreshCanvas();
+                     }
+                });
+    
+                document.getElementById('labelInput').addEventListener('keyup', (e) => {
+                     if (e.which === 13) {
+                        this.fbCanvasObj.saveLabel(this.value, USE_CURRENT_SELECTION);
+                         this.fbCanvasObj.hideEditLabel();
+                         this.fbCanvasObj.refreshCanvas();
+                     }
+                });
+                document.getElementById('labelInput').addEventListener('blur', () => {
+                    this.fbCanvasObj.saveLabel(this.value, USE_LAST_SELECTION);
+                     this.fbCanvasObj.hideEditLabel();
+                });
+            }
+    }
 
-    // The rest of your DOMContentLoaded listener code...
-    // ... (Event listeners for color blocks, actions, etc.)
-
-    // Generic input change listener for form elements within the dialog
-    $('#dialog-form').on('change', 'input, select', function (event) {
-        const p = new Point();
-        fbCanvasObj.updateCanvas(p);
-    });
-
-    document.querySelectorAll('.colorBlock').forEach(block => {
-        block.addEventListener('click', function (e) {
-            fbCanvasObj.setFillColor(this.style.backgroundColor);
-            document.querySelectorAll('.colorBlock').forEach(b => b.classList.remove('colorSelected'));
-            this.classList.add('colorSelected');
-            fbCanvasObj.updateColorsOfSelectedBars();
-            fbCanvasObj.refreshCanvas();
-        });
-    });
-
-    document.querySelectorAll('.colorBlock1').forEach(block => {
-        block.addEventListener('click', function (e) {
-            document.getElementById('fbCanvas').style.backgroundColor = this.style.backgroundColor;
-            document.querySelectorAll('.colorBlock1').forEach(b => b.classList.remove('colorSelected'));
-            this.classList.add('colorSelected');
-        });
-    });
-
-    document.querySelectorAll('a').forEach(link => {
-        link.addEventListener('click', function (e) {
-            handleActionClick(this.id);
-        });
-    });
-
-    function handleActionClick(actionId) {
+     handleActionClick(actionId) {
         if (actionId === null) { return; }
-        let tool_on = false;
+            let tool_on = false;
 
-        if ((fbCanvasObj.currentAction === 'hide') && (actionId.indexOf('hide') === -1)) {
-            hideButton(actionId);
+        if ((this.fbCanvasObj.currentAction === 'hide') && (actionId.indexOf('hide') === -1)) {
+            this.hideButton(actionId);
             return;
         }
 
-        if (actionId.indexOf('tool_') > -1) {
-            const toolName = actionId.substring(5);
-            tool_on = toggleTool(toolName);
-            fbCanvasObj.handleToolUpdate(toolName, tool_on);
-            fbCanvasObj.refreshCanvas();
+         if (actionId.indexOf('tool_') > -1) {
+             const toolName = actionId.substring(5);
+            tool_on = this.toggleTool(toolName);
+             this.fbCanvasObj.handleToolUpdate(toolName, tool_on);
+            this.fbCanvasObj.refreshCanvas();
         }
 
-        if (actionId.indexOf('action_') > -1) {
-            const actionName = actionId.substring(7);
-            handleAction(actionName);
+         if (actionId.indexOf('action_') > -1) {
+             const actionName = actionId.substring(7);
+             this.handleAction(actionName);
         }
 
         if (actionId.indexOf('window_') > -1) {
-            const windowName = actionId.substring(7);
-            handleWindowAction(windowName);
+             const windowName = actionId.substring(7);
+             this.handleWindowAction(windowName);
         }
     }
 
-    function toggleTool(toolName) {
-        const toolOn = toolName.toString() === fbCanvasObj.currentAction.toString();
-        fbCanvasObj.clear_selection_button();
-        if (!toolOn) {
-            fbCanvasObj.currentAction = toolName;
-            document.getElementById(`tool_${toolName}`).classList.add('toolSelected');
-            return true;
+    toggleTool(toolName) {
+        const toolOn = toolName.toString() === this.fbCanvasObj.currentAction.toString();
+       this.fbCanvasObj.clear_selection_button();
+         if (!toolOn) {
+           this.fbCanvasObj.currentAction = toolName;
+           document.getElementById(`tool_${toolName}`).classList.add('toolSelected');
+           return true;
         }
         return false;
     }
 
-    function handleAction(actionName) {
-        fbCanvasObj.name = actionName;
+    handleAction(actionName) {
+         this.fbCanvasObj.name = actionName;
         const actions = {
             'copy': () => {
-                fbCanvasObj.addUndoState();
-                fbCanvasObj.copyBars();
-                fbCanvasObj.refreshCanvas();
-            },
-            'delete': () => {
-                fbCanvasObj.addUndoState();
-                fbCanvasObj.deleteSelectedBars();
-                fbCanvasObj.refreshCanvas();
+                 this.fbCanvasObj.addUndoState();
+                this.fbCanvasObj.copyBars();
+                this.fbCanvasObj.refreshCanvas();
+           },
+             'delete': () => {
+                 this.fbCanvasObj.addUndoState();
+                this.fbCanvasObj.deleteSelectedBars();
+                this.fbCanvasObj.refreshCanvas();
             },
             'join': () => {
-                fbCanvasObj.addUndoState();
-                fbCanvasObj.joinSelected();
-                fbCanvasObj.refreshCanvas();
+                 this.fbCanvasObj.addUndoState();
+                 this.fbCanvasObj.joinSelected();
+                this.fbCanvasObj.refreshCanvas();
             },
-            'setUnitBar': () => {
-                fbCanvasObj.addUndoState();
-                fbCanvasObj.setUnitBar();
-                fbCanvasObj.refreshCanvas();
-            },
+             'setUnitBar': () => {
+                this.fbCanvasObj.addUndoState();
+               this.fbCanvasObj.setUnitBar();
+                 this.fbCanvasObj.refreshCanvas();
+             },
             'measure': () => {
-                fbCanvasObj.addUndoState();
-                fbCanvasObj.measureBars();
-                fbCanvasObj.refreshCanvas();
+                 this.fbCanvasObj.addUndoState();
+                this.fbCanvasObj.measureBars();
+                this.fbCanvasObj.refreshCanvas();
             },
-            'make': () => {
-                fbCanvasObj.addUndoState();
-                fbCanvasObj.make();
-                fbCanvasObj.refreshCanvas();
+             'make': () => {
+                this.fbCanvasObj.addUndoState();
+                this.fbCanvasObj.make();
+                this.fbCanvasObj.refreshCanvas();
+           },
+             'breakApart': () => {
+                this.fbCanvasObj.addUndoState();
+                this.fbCanvasObj.breakApartBars();
+                this.fbCanvasObj.refreshCanvas();
             },
-            'breakApart': () => {
-                fbCanvasObj.addUndoState();
-                fbCanvasObj.breakApartBars();
-                fbCanvasObj.refreshCanvas();
-            },
-            'clearSplits': () => {
-                fbCanvasObj.addUndoState();
-                fbCanvasObj.clearSplits();
-                fbCanvasObj.refreshCanvas();
-            },
+             'clearSplits': () => {
+               this.fbCanvasObj.addUndoState();
+               this.fbCanvasObj.clearSplits();
+                this.fbCanvasObj.refreshCanvas();
+             },
             'pullOutSplit': () => {
-                fbCanvasObj.addUndoState();
-                fbCanvasObj.pullOutSplit();
-                fbCanvasObj.refreshCanvas();
+                 this.fbCanvasObj.addUndoState();
+                this.fbCanvasObj.pullOutSplit();
+                 this.fbCanvasObj.refreshCanvas();
             },
-            'undo': () => {
-                fbCanvasObj.undo();
-                fbCanvasObj.refreshCanvas();
+             'undo': () => {
+                 this.fbCanvasObj.undo();
+                this.fbCanvasObj.refreshCanvas();
             },
-            'redo': () => {
-                fbCanvasObj.redo();
-                fbCanvasObj.refreshCanvas();
+             'redo': () => {
+                 this.fbCanvasObj.redo();
+                 this.fbCanvasObj.refreshCanvas();
             },
-            'save': () => {
-                fbCanvasObj.save();
+             'save': () => {
+                 this.fbCanvasObj.save();
             },
-            'open': () => {
-                SaveScreen();
-                resetFormElement($("#files"));
-                fbCanvasObj.openFileDialog();
-            },
-            'print': () => {
-                fbCanvasObj.print_canvas();
+             'open': () => {
+                this.SaveScreen();
+                this.resetFormElement($("#files"));
+                 this.fbCanvasObj.openFileDialog();
+             },
+             'print': () => {
+                 this.fbCanvasObj.print_canvas();
             },
             'clearAll': () => {
-                SaveScreen();
+               this.SaveScreen();
                 location.reload();
+             },
+             'show': () => {
+                 this.showAllButtons();
             },
-            'show': () => {
-                showAllButtons();
-            },
-            'previous': () => {
-                previousSelectFile();
-            },
-            'next': () => {
-                nextSelectFile();
-            }
-        };
+             'previous': () => {
+                 this.previousSelectFile();
+             },
+             'next': () => {
+                 this.nextSelectFile();
+             }
+         };
 
         const action = actions[actionName];
-        if (action) {
+         if (action) {
             action();
         }
     }
 
-    function handleWindowAction(windowName) {
-        fbCanvasObj.addUndoState();
-        const actions = {
-            'label': () => fbCanvasObj.editLabel(),
-            'split': () => fbCanvasObj.split(splitWidgetObj),
-            'iterate': () => fbCanvasObj.iterate(),
-            'properties': () => fbCanvasObj.properties()
-        };
-
+     handleWindowAction(windowName) {
+         this.fbCanvasObj.addUndoState();
+         const actions = {
+            'label': () => this.fbCanvasObj.editLabel(),
+             'split': () => this.fbCanvasObj.split(this.splitWidgetObj),
+            'iterate': () => this.fbCanvasObj.iterate(),
+             'properties': () => this.fbCanvasObj.properties()
+         };
         const action = actions[windowName];
-        if (action) {
+         if (action) {
             action();
         }
     }
 
-    document.addEventListener('keydown', function (e) {
-        if (e.which === 16) {
-            Utilities.shiftKeyDown = true;
-            fbCanvasObj.refreshCanvas();
+     showAllButtons() {
+        while (this.hiddenButtons.length > 0) {
+             const thing = this.hiddenButtons.pop();
+            thing.show();
         }
+         this.hiddenButtons = [];
+         this.hiddenButtonsName = [];
+    }
 
-        if (e.ctrlKey && e.keyCode == 80) {
-            fbCanvasObj.properties();
-            fbCanvasObj.refreshCanvas();
+     SaveScreen() {
+        const r = window.confirm("Do you want to save?");
+         if (r == true) {
+            this.fbCanvasObj.save();
         }
+    }
 
-        if (e.ctrlKey && e.keyCode == 83) {
-            fbCanvasObj.save();
-            fbCanvasObj.refreshCanvas();
-        }
-
-        if (e.ctrlKey && e.keyCode == 72) {
-            if (Utilities.ctrlKeyDown) {
-                showButton("tool_hide");
-                showButton("action_show");
-                Utilities.ctrlKeyDown = false;
+     showButton(item) {
+         let cnt = 0;
+         while (this.hiddenButtonsName.length > 0) {
+             if (this.hiddenButtonsName[cnt] === item) {
+                 const rem_but1 = this.hiddenButtonsName.splice(cnt, 1);
+                this.hiddenButtons.splice(cnt, 1);
             } else {
-                Utilities.ctrlKeyDown = true;
-                hideButton("tool_hide");
-                hideButton("action_show");
+                 cnt++;
+             }
+             if (this.hiddenButtonsName.length === cnt) {
+                $(document.getElementById(rem_but1)).show();
+                break;
             }
-            fbCanvasObj.clear_selection_button();
-            fbCanvasObj.refreshCanvas();
         }
-
-        if (e.ctrlKey && e.keyCode == 46) {
-            fbCanvasObj.addUndoState();
-            fbCanvasObj.deleteSelectedBars();
-            fbCanvasObj.refreshCanvas();
-        }
-    });
-
-    document.addEventListener('keyup', function (e) {
-        if (e.which === 16) {
-            Utilities.shiftKeyDown = false;
-            fbCanvasObj.refreshCanvas();
-        }
-    });
-
-    document.getElementById('labelInput').addEventListener('keyup', function (e) {
-        if (e.which === 13) {
-            fbCanvasObj.saveLabel(this.value, USE_CURRENT_SELECTION);
-            fbCanvasObj.hideEditLabel();
-            fbCanvasObj.refreshCanvas();
-        }
-    });
-
-    document.getElementById('labelInput').addEventListener('blur', function () {
-        fbCanvasObj.saveLabel(this.value, USE_LAST_SELECTION);
-        fbCanvasObj.hideEditLabel();
-    });
-});
-
-function showAllButtons() {
-    while (hiddenButtons.length > 0) {
-        const thing = hiddenButtons.pop();
-        thing.show();
     }
-    hiddenButtons = [];
-    hiddenButtonsName = [];
-}
-
-function SaveScreen() {
-    const r = window.confirm("Do you want to save?");
-    if (r == true) {
-        fbCanvasObj.save();
+    hideButton(item) {
+         if (this.hiddenButtonsName.indexOf(item) < 0) {
+             const hidden = document.getElementById(item);
+             $(hidden).hide();
+             this.hiddenButtonsName.push(item);
+            this.hiddenButtons.push($(hidden));
+        }
     }
-}
 
-function showButton(item) {
-    let cnt = 0;
-    while (hiddenButtonsName.length > 0) {
-        if (hiddenButtonsName[cnt] === item) {
-            const rem_but1 = hiddenButtonsName.splice(cnt, 1);
-            hiddenButtons.splice(cnt, 1);
+     handleFileSelect(event) {
+        const files = event.target.files;
+         if (files.length === 0) {
+             return;
+        }
+        this.file_list = event.target.files;
+         this.file_index = 0;
+         const aFile = files[0];
+         this.readFileOpen(aFile);
+     }
+
+     handleListSelect(event) {
+       this.file_index = document.getElementById('id_filetext').selectedIndex;
+        const a_files = this.file_list;
+       this.fbCanvasObj.save();
+        const aFileIndex = this.file_index;
+         const aFile = a_files[aFileIndex];
+        this.readFileOpen(aFile);
+    }
+
+    nextSelectFile() {
+       this.fbCanvasObj.save();
+        const n_files = this.file_list;
+         this.file_index = this.file_index + 1;
+         document.getElementById('id_filetext').selectedIndex = this.file_index;
+         const nFileIndex = this.file_index;
+        const nFile = n_files[nFileIndex];
+         this.readFileOpen(nFile);
+    }
+
+    previousSelectFile() {
+         this.fbCanvasObj.save();
+        const p_files = this.file_list;
+         this.file_index = this.file_index - 1;
+         document.getElementById('id_filetext').selectedIndex = this.file_index;
+         const pFileIndex = this.file_index;
+         const pFile = p_files[pFileIndex];
+         this.readFileOpen(pFile);
+    }
+
+    readFileOpen(oFile) {
+       this.showAllButtons();
+       this.fbCanvasObj.mUndoArray = [];
+        this.fbCanvasObj.mRedoArray = [];
+
+        const reader = new FileReader();
+
+        reader.onload = (fileEvent) => {
+            this.fbCanvasObj.handleFileEvent(fileEvent);
+        };
+        reader.readAsText(oFile);
+        this.showSelectList();
+     }
+
+    showSelectList() {
+        const f_files = this.file_list;
+        const first = document.getElementById('id_filetext');
+         const b_title = document.getElementById('bar_titles');
+         const file_length = f_files.length;
+        let select_length = document.getElementById('id_filetext').selectedIndex;
+         const s_files = this.file_list[this.file_index];
+         select_length = select_length + 1;
+        document.title = s_files.name;
+        b_title.innerHTML = ": " + s_files.name;
+        if (file_length === 1) {
+             this.hideButton("id_filetext");
+             this.hideButton("action_previous");
+             this.hideButton("action_next");
+        }
+         else if (file_length === select_length) {
+            this.showButton("id_filetext");
+             this.showButton("action_previous");
+             this.hideButton("action_next");
+        }
+        else if (select_length === 1 || select_length === 0) {
+             this.showButton("id_filetext");
+            this.hideButton("action_previous");
+            this.showButton("action_next");
+        }
+        else {
+            this.showButton("id_filetext");
+            this.showButton("action_previous");
+            this.showButton("action_next");
+        }
+        first.innerHTML = '';
+        for (let i = 0, f1; f1 = f_files[i]; i++) {
+            first.innerHTML = first.innerHTML + '<option value="' + f1.name + '"' + (s_files.name === f1.name ? ' selected' : '') + '>' + f1.name + '</option>';
+       }
+    }
+
+    resetFormElement(e) {
+         e.wrap('<form>').closest('form').get(0).reset();
+        e.unwrap();
+    }
+
+    updateMouseLoc(e, elem) {
+        const x = e.clientX - elem.getBoundingClientRect().left;
+         const y = e.clientY - elem.getBoundingClientRect().top;
+    }
+     
+     updateMouseAction(actionName) {
+         // Update mouse action if needed
+     }
+
+     handleBarClick(b) {
+         if ($.inArray(b, this.fbCanvasObj.selectedBars) == -1) {
+            if (!Utilities.shiftKeyDown) {
+                this.fbCanvasObj.clearSelection();
+             }
+             $.each(this.fbCanvasObj.selectedBars, function (index, bar) {
+                bar.clearSplitSelection();
+            });
+            this.fbCanvasObj.barToFront(b);
+             this.fbCanvasObj.selectedBars.push(b);
+            b.isSelected = true;
+            b.selectSplit(this.fbCanvasObj.mouseDownLoc);
         } else {
-            cnt++;
+            $.each(this.fbCanvasObj.selectedBars, function (index, bar) {
+               bar.clearSplitSelection();
+            });
+             if (!Utilities.shiftKeyDown) {
+               b.selectSplit(this.fbCanvasObj.mouseDownLoc);
+            } else {
+                this.fbCanvasObj.removeBarFromSelection(b);
+            }
+           this.fbCanvasObj.barToFront(b);
         }
-        if (hiddenButtonsName.length === cnt) {
-            $(document.getElementById(rem_but1)).show();
-            break;
+        if (this.fbCanvasObj.currentAction == "manualSplit") {
+            this.fbCanvasObj.clearSelection();
         }
-    }
-}
+     }
 
-function hideButton(item) {
-    if (hiddenButtonsName.indexOf(item) < 0) {
-        const hidden = document.getElementById(item);
-        $(hidden).hide();
-        hiddenButtonsName.push(item);
-        hiddenButtons.push($(hidden));
-    }
-}
-function handleFileSelect(event) {
-    const files = event.target.files;
-    if (files.length === 0) {
-        return;
-    }
-    file_list = event.target.files;
-    file_index = 0;
-    const aFile = files[0];
-    readFileOpen(aFile);
-}
-
-function handleListSelect(event) {
-    file_index = document.getElementById('id_filetext').selectedIndex;
-    const a_files = file_list;
-    fbCanvasObj.save();
-    const aFileIndex = file_index;
-    const aFile = a_files[aFileIndex];
-    readFileOpen(aFile);
-}
-
-function nextSelectFile() {
-    fbCanvasObj.save();
-    const n_files = file_list;
-    file_index = file_index + 1;
-    document.getElementById('id_filetext').selectedIndex = file_index;
-    const nFileIndex = file_index;
-    const nFile = n_files[nFileIndex];
-    readFileOpen(nFile);
-}
-
-function previousSelectFile() {
-    fbCanvasObj.save();
-    const p_files = file_list;
-    file_index = file_index - 1;
-    document.getElementById('id_filetext').selectedIndex = file_index;
-    const pFileIndex = file_index;
-    const pFile = p_files[pFileIndex];
-    readFileOpen(pFile);
-}
-
-function readFileOpen(oFile) {
-    showAllButtons();
-    fbCanvasObj.mUndoArray = [];
-    fbCanvasObj.mRedoArray = [];
-
-    const reader = new FileReader();
-
-    reader.onload = function (fileEvent) {
-        fbCanvasObj.handleFileEvent(fileEvent);
-    };
-
-    reader.readAsText(oFile);
-    showSelectList();
-}
-
-function showSelectList() {
-    const f_files = file_list;
-    const first = document.getElementById('id_filetext');
-    const b_title = document.getElementById('bar_titles');
-    const file_length = f_files.length;
-    let select_length = document.getElementById('id_filetext').selectedIndex;
-    const s_files = file_list[file_index];
-    select_length = select_length + 1;
-    document.title = s_files.name;
-    b_title.innerHTML = ": " + s_files.name;
-    if (file_length === 1) {
-        hideButton("id_filetext");
-        hideButton("action_previous");
-        hideButton("action_next");
-    }
-    else if (file_length === select_length) {
-        showButton("id_filetext");
-        showButton("action_previous");
-        hideButton("action_next");
-    }
-    else if (select_length === 1 || select_length === 0) {
-        showButton("id_filetext");
-        hideButton("action_previous");
-        showButton("action_next");
-    }
-    else {
-        showButton("id_filetext");
-        showButton("action_previous");
-        showButton("action_next");
-    }
-    first.innerHTML = '';
-    for (let i = 0, f1; f1 = f_files[i]; i++) {
-        first.innerHTML = first.innerHTML + '<option value="' + f1.name + '"' + (s_files.name === f1.name ? ' selected' : '') + '>' + f1.name + '</option>';
-    }
-}
-
-function resetFormElement(e) {
-    e.wrap('<form>').closest('form').get(0).reset();
-    e.unwrap();
-}
-
-function updateMouseLoc(e, elem) {
-    const x = e.clientX - elem.getBoundingClientRect().left;
-    const y = e.clientY - elem.getBoundingClientRect().top;
-}
-
-function updateMouseAction(actionName) {
-    // Update mouse action if needed
-}
-
-function handleBarClick(b) {
-    if ($.inArray(b, fbCanvasObj.selectedBars) == -1) {
-        if (!Utilities.shiftKeyDown) {
-            fbCanvasObj.clearSelection();
-        }
-        $.each(fbCanvasObj.selectedBars, function (index, bar) {
-            bar.clearSplitSelection();
-        });
-        fbCanvasObj.barToFront(b);
-        fbCanvasObj.selectedBars.push(b);
-        b.isSelected = true;
-        b.selectSplit(fbCanvasObj.mouseDownLoc);
-    } else {
-        $.each(fbCanvasObj.selectedBars, function (index, bar) {
-            bar.clearSplitSelection();
-        });
-        if (!Utilities.shiftKeyDown) {
-            b.selectSplit(fbCanvasObj.mouseDownLoc);
+    handleMatClick(m) {
+        if ($.inArray(m, this.fbCanvasObj.selectedMats) == -1) {
+            if (!Utilities.shiftKeyDown) {
+               this.fbCanvasObj.clearSelection();
+            }
+            m.isSelected = true;
+             this.fbCanvasObj.selectedMats.push(m);
         } else {
-            fbCanvasObj.removeBarFromSelection(b);
+           if (Utilities.shiftKeyDown) {
+               this.fbCanvasObj.removeMatFromSelection(m);
+            }
         }
-        fbCanvasObj.barToFront(b);
-    }
-    if (fbCanvasObj.currentAction == "manualSplit") {
-        fbCanvasObj.clearSelection();
-    }
-}
+     }
 
-function handleMatClick(m) {
-    if ($.inArray(m, fbCanvasObj.selectedMats) == -1) {
-        if (!Utilities.shiftKeyDown) {
-            fbCanvasObj.clearSelection();
-        }
-        m.isSelected = true;
-        fbCanvasObj.selectedMats.push(m);
-    } else {
-        if (Utilities.shiftKeyDown) {
-            fbCanvasObj.removeMatFromSelection(m);
+    handleMouseDown(e) {
+        if (!this.fbCanvasObj) return;
+        const elem = $('#fbCanvas');
+        this.fbCanvasObj.mouseDownLoc = Point.createFromMouseEvent(e, elem);
+
+        if (this.fbCanvasObj.currentAction == "bar" || this.fbCanvasObj.currentAction == "mat") {
+             this.fbCanvasObj.saveCanvas();
+        } else if (this.fbCanvasObj.currentAction !== 'hide'){
+             const the_bar = this.fbCanvasObj.barClickedOn();
+            if (the_bar) {
+                this.handleBarClick(the_bar);
+               this.fbCanvasObj.cacheUndoState();
+             } else {
+                 const the_mat = this.fbCanvasObj.matClickedOn();
+                 if (the_mat) {
+                    this.handleMatClick(the_mat);
+                    this.fbCanvasObj.cacheUndoState();
+                } else {
+                    this.fbCanvasObj.clearSelection();
+                 }
+             }
+            this.fbCanvasObj.check_for_drag = true;
+             this.fbCanvasObj.refreshCanvas();
         }
     }
-}
 
-// Generic input change listener for form elements within the dialog
-$('#dialog-form').on('change', 'input, select', function(event) {
-    const p = new Point();
-    fbCanvasObj.updateCanvas(p);
+    handleMouseUp(e) {
+        if (!this.fbCanvasObj) return;
+       const elem = $('#fbCanvas');
+       this.fbCanvasObj.mouseUpLoc = Point.createFromMouseEvent(e, elem);
+
+         if (this.fbCanvasObj.currentAction == "bar") {
+             this.fbCanvasObj.addBar();
+       } else if (this.fbCanvasObj.currentAction == "mat") {
+             this.fbCanvasObj.addMat();
+        } else if (this.fbCanvasObj.found_a_drag) {
+             this.fbCanvasObj.finalizeCachedUndoState();
+        } else {
+            this.fbCanvasObj.manualSplitPoint = null;
+            this.fbCanvasObj.refreshCanvas();
+        }
+       this.fbCanvasObj.clearMouse();
+    }
+
+    handleMouseMove(e) {
+        if (!this.fbCanvasObj) return;
+       const elem = $('#fbCanvas');
+       const mouseLoc = Point.createFromMouseEvent(e, elem);
+         this.fbCanvasObj.updateCanvas(mouseLoc);
+   }
+
+    handleClick(e) {
+      if (!this.fbCanvasObj) return;
+      const elem = $('#fbCanvas');
+      this.fbCanvasObj.mouseDownLoc = Point.createFromMouseEvent(e, elem);
+
+       if (this.fbCanvasObj.currentAction == "bar" || this.fbCanvasObj.currentAction == "mat") {
+            this.fbCanvasObj.saveCanvas();
+       } else if (this.fbCanvasObj.currentAction !== 'hide'){
+             const the_bar = this.fbCanvasObj.barClickedOn();
+            if (the_bar) {
+                 this.handleBarClick(the_bar);
+             } else {
+                 const the_mat = this.fbCanvasObj.matClickedOn();
+                 if (the_mat) {
+                    this.handleMatClick(the_mat);
+                } else {
+                     this.fbCanvasObj.clearSelection();
+                 }
+            }
+        }
+         this.fbCanvasObj.clearMouse();
+        this.fbCanvasObj.refreshCanvas();
+    }
+ }
+
+// Initialize the FractionBars application
+$(document).ready(() => {
+    const fractionBars = new FractionBars();
+    fractionBars.init();
+     window.fractionBars = fractionBars; // For debugging
+    document.getElementById("files").addEventListener('change', (e) => {
+        fractionBars.handleFileSelect(e);
+    }, false);
+
+    document.getElementById('id_filetext').addEventListener('change', (e) => {
+        fractionBars.handleListSelect(e);
+    }, false);
 });
