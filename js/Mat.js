@@ -14,7 +14,7 @@ export default class Mat {
 
     copy(with_offset) {
         let offset = 10;
-        let b = new Bar();
+        let b = new Mat();
 
         if (with_offset === false) {
             offset = 0;
