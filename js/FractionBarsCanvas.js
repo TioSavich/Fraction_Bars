@@ -27,7 +27,6 @@ export default class FractionBarsCanvas {
 
         this.mUndoArray = [];
         this.mRedoArray = [];
-
         this.check_for_drag = false;
         this.found_a_drag = false;
 
@@ -134,7 +133,6 @@ export default class FractionBarsCanvas {
 
     editLabel() {
         const canvasPos = $('#fbCanvas').position();
-
         if (this.selectedBars.length == 1) {
             const labelDiv = $('#labelInput');
             $('#labelInput').css('position', 'absolute');
@@ -337,12 +335,12 @@ export default class FractionBarsCanvas {
                     this.unsetBarRepeats();
                 }
                 break;
-            // Add cases for other tools if needed
         }
     }
 
     drawPreviewRect(p1, p2) {
-        this.context.fillStyle = (this.currentAction === "bar") ? this.currentFill : this.matFill;
+        this.context.fillStyle = (this.currentAction === "bar") ?
+            this.currentFill : this.matFill;
         const w = Math.abs(p2.x - p1.x);
         const h = Math.abs(p2.y - p1.y);
         const p = Point.min(p1, p2);
@@ -369,7 +367,6 @@ export default class FractionBarsCanvas {
         }
 
         this.context.fillStyle = b.color;
-
         this.context.strokeStyle = '#000000';
         if (b.isSelected) {
             this.context.lineWidth = 2.5;
@@ -415,55 +412,28 @@ export default class FractionBarsCanvas {
         this.context.fillText(b.fraction, b.x + b.w - fractionStringMetrics.width - 5, b.y - 5);
 
         const labelStringMetrics = this.context.measureText(b.label);
-        this.context.fillText(b.label, b.x + 5, b.y + b.h - 5);
+        this.context.fillText(b.label, b.x + 5, b.y + b.h -5);
 
-        this.context.fillStyle = this.currentFill;
-
+        if (b.repeatUnit !== null) {
+            this.context.strokeStyle = '#0000FF';
+            this.context.strokeRect(b.x + 0.5, b.y + 0.5, b.w, b.h);
+            this.context.strokeStyle = '#000000';
+        }
     }
 
-    drawMat(b) {
-
-        this.context.fillStyle = b.color;
-        this.context.fillRect(b.x + 0.5, b.y + 0.5, b.w, b.h);
-
-        this.context.strokeStyle = '#FF0000';
-
+    drawMat(m) {
+        this.context.fillStyle = m.color;
+        this.context.fillRect(m.x + 0.5, m.y + 0.5, m.w, m.h);
         this.context.strokeStyle = '#000000';
-        if (b.isSelected) {
+        if (m.isSelected) {
             this.context.lineWidth = 2.5;
         }
-
-        this.context.strokeRect(b.x + 0.5, b.y + 0.5, b.w, b.h);
-
+        this.context.strokeRect(m.x + 0.5, m.y + 0.5, m.w, m.h);
         this.context.lineWidth = 1;
-        this.context.fillStyle = '#000000';
-
-        this.context.fillStyle = this.currentFill;
-
-    }
-
-    updateCanvas(currentMouseLoc) {
-        if ((this.currentAction === 'bar') || (this.currentAction === 'mat')) {
-            if (this.canvasState !== null) {
-                this.context.putImageData(this.canvasState, 0, 0);
-            }
-            if (this.mouseDownLoc !== null) {
-                this.drawPreviewRect(this.mouseDownLoc, currentMouseLoc);
-            }
-        } else if (this.currentAction == "manualSplit") {
-            this.manualSplitPoint = currentMouseLoc;
-        } else {
-            // we're dragging stuff around
-            this.drag(currentMouseLoc);
-        }
-    }
-
-    saveCanvas() {
-        this.canvasState = this.context.getImageData(0, 0, 1000, 600);
     }
 
     refreshCanvas() {
-        this.context.clearRect(0, 0, 1000, 600);
+        this.context.clearRect(0, 0, $('#fbCanvas').width(), $('#fbCanvas').height());
         for (let i = 0; i < this.mats.length; i++) {
             this.drawMat(this.mats[i]);
         }
@@ -472,177 +442,144 @@ export default class FractionBarsCanvas {
         }
     }
 
-    setFillColor(fillColor) {
-        this.currentFill = fillColor;
-        this.context.fillStyle = this.currentFill;
+    updateCanvas(loc) {
+        switch (this.currentAction) {
+            case 'bar':
+                this.addBar();
+                break;
+
+            case 'mat':
+                this.addMat();
+                break;
+
+            case 'select':
+                this.selectTool(loc);
+                break;
+
+            case 'move':
+                this.moveTool(loc);
+                break;
+
+            case 'erase':
+                this.eraseTool(loc);
+                break;
+
+            case 'copy':
+                this.copyTool(loc);
+                break;
+        }
+    }
+
+    selectTool(loc) {
+        const theBar = this.findBarForPoint(loc);
+        if (theBar !== null) {
+            if (theBar.isSelected) {
+                this.removeBarFromSelection(theBar);
+            } else {
+                if (!Utilities.shiftKeyDown) {
+                    this.clearSelection();
+                }
+                this.selectedBars.push(theBar);
+                theBar.setSelected(true);
+            }
+        } else {
+            const theMat = this.matClickedOn();
+            if (theMat !== null) {
+                if (theMat.isSelected) {
+                    this.removeMatFromSelection(theMat);
+                } else {
+                    if (!Utilities.shiftKeyDown) {
+                        this.clearSelection();
+                    }
+                    this.selectedMats.push(theMat);
+                    theMat.setSelected(true);
+                }
+            } else {
+                if (!Utilities.shiftKeyDown) {
+                    this.clearSelection();
+                }
+            }
+        }
+        this.refreshCanvas();
+    }
+
+    moveTool(loc) {
+        if (this.selectedBars.length > 0) {
+            this.found_a_drag = true;
+            const deltaX = loc.x - this.mouseLastLoc.x;
+            const deltaY = loc.y - this.mouseLastLoc.y;
+            for (let i = 0; i < this.selectedBars.length; i++) {
+                this.selectedBars[i].moveBar(deltaX, deltaY);
+            }
+        }
+        if (this.selectedMats.length > 0) {
+            this.found_a_drag = true;
+            const deltaX = loc.x - this.mouseLastLoc.x;
+            const deltaY = loc.y - this.mouseLastLoc.y;
+            for (let i = 0; i < this.selectedMats.length; i++) {
+                this.selectedMats[i].moveMat(deltaX, deltaY);
+            }
+        }
+        this.refreshCanvas();
+    }
+
+    eraseTool(loc) {
+        const theBar = this.findBarForPoint(loc);
+        if (theBar !== null) {
+            this.removeBarFromSelection(theBar);
+            this.deleteSelectedBars();
+        } else {
+            const theMat = this.matClickedOn();
+            if (theMat !== null) {
+                this.removeMatFromSelection(theMat);
+                this.deleteSelectedBars();
+            }
+        }
+        this.refreshCanvas();
+    }
+
+    copyTool(loc) {
+        this.copyBars();
+        this.moveTool(loc);
+        this.currentAction = 'move';
     }
 
     clearMouse() {
         this.mouseDownLoc = null;
         this.mouseUpLoc = null;
-    }
-
-    
-    drag(currentLoc) {
-        if (!this.mouseLastLoc) {
-            this.mouseLastLoc = this.mouseDownLoc;
-        }
-    
-        const dx = currentLoc.x - this.mouseLastLoc.x;
-        const dy = currentLoc.y - this.mouseLastLoc.y;
-    
-        this.selectedBars.forEach(bar => {
-            bar.x += dx;
-            bar.y += dy;
-        });
-    
-        this.selectedMats.forEach(mat => {
-            mat.x += dx;
-            mat.y += dy;
-        });
-    
-        if (this.check_for_drag) {
-            this.found_a_drag = true;
-            this.check_for_drag = false;
-        }
-    
-        this.mouseLastLoc = currentLoc;
-        this.refreshCanvas();
+        this.mouseLastLoc = null;
     }
 
     addUndoState() {
-        const newState = new CanvasState();
-        newState.grabBarsAndMats(this);
-        this.mUndoArray.push(newState);
-        while (this.mUndoArray.length > 100) {
-            this.mUndoArray.shift();
-        }
+        this.canvasState = new CanvasState(this.bars, this.mats, this.currentFill, this.matFill, this.hiddenButtonsName);
+        this.mUndoArray.push(this.canvasState);
         this.mRedoArray = [];
-    }
-
-    cacheUndoState() {
-        this.CachedState = new CanvasState();
-        this.CachedState.grabBarsAndMats(this);
-    }
-
-    finalizeCachedUndoState() {
-        if (this.CachedState !== null) {
-            this.mUndoArray.push(this.CachedState);
-            while (this.mUndoArray.length > 100) {
-                this.mUndoArray.shift();
-            }
-            this.mRedoArray = [];
-        }
-        this.check_for_drag = false;
-        this.found_a_drag = false;
+        $('#undo').prop('disabled', false);
+        $('#redo').prop('disabled', true);
     }
 
     undo() {
         if (this.mUndoArray.length > 0) {
-            const newState = new CanvasState();
-            newState.grabBarsAndMats(this);
-            this.mRedoArray.push(newState);
-            this.restoreAState(this.mUndoArray.pop());
+            this.canvasState = this.mUndoArray.pop();
+            this.mRedoArray.push(this.canvasState);
+            this.restoreBarsAndMatsFromJSON(this.canvasState);
+            $('#redo').prop('disabled', false);
+            if (this.mUndoArray.length === 0) {
+                $('#undo').prop('disabled', true);
+            }
         }
     }
 
     redo() {
         if (this.mRedoArray.length > 0) {
-            const newState = new CanvasState();
-            newState.grabBarsAndMats(this);
-            this.mUndoArray.push(newState);
-            this.restoreAState(this.mRedoArray.pop());
-        }
-    }
-
-    restoreAState(a_new_state) {
-        this.bars = [];
-        this.mats = [];
-        this.selectedBars = [];
-        this.selectedMats = [];
-
-        while (a_new_state.mBars.length > 0) {
-            let temp_bar = a_new_state.mBars.shift();
-            this.bars.push(temp_bar);
-        }
-
-        while (a_new_state.mMats.length > 0) {
-            this.mats.push(a_new_state.mMats.shift());
-        }
-
-        this.unitBar = a_new_state.mUnitBar;
-        if (this.unitBar !== null) {
-            this.unitBar.isUnitBar = true;
-            this.unitBar.fraction = '1/1';
-        }
-        this.clearSelection();
-    }
-
-     save() {
-        const newState = new CanvasState();
-        newState.grabBarsAndMats(this);
-    
-        const state_string = JSON.stringify(JSON.decycle(newState));
-    
-        const file = new Blob([state_string], { type: 'application/json' });
-    
-        // Create a link and set the filename
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(file);
-        link.download = 'fraction_bars_state.json';
-    
-        // Append the link, click it to start download, and then remove it
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    }
-
-    openFileDialog() {
-         const fileInput = document.createElement('input');
-        fileInput.type = 'file';
-        fileInput.accept = '.json';
-        fileInput.style.display = 'none';
-    
-        document.body.appendChild(fileInput);
-    
-        fileInput.addEventListener('change', (event) => {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-    
-                reader.onload = (e) => {
-                    try {
-                        const file_contents = e.target.result;
-                        const parsedData = JSON.retrocycle(JSON.parse(file_contents));
-                        this.restoreBarsAndMatsFromJSON(parsedData);
-                     } catch (error) {
-                        console.error("Error parsing JSON data:", error);
-                        alert("Failed to load the selected file.");
-                    }
-                };
-    
-                reader.onerror = (error) => {
-                    console.error("Error reading file:", error);
-                    alert("Failed to read the selected file.");
-                };
-    
-                reader.readAsText(file);
+            this.canvasState = this.mRedoArray.pop();
+            this.mUndoArray.push(this.canvasState);
+            this.restoreBarsAndMatsFromJSON(this.canvasState);
+            $('#undo').prop('disabled', false);
+            if (this.mRedoArray.length === 0) {
+                $('#redo').prop('disabled', true);
             }
-    
-             document.body.removeChild(fileInput);
-        });
-    
-        fileInput.click();
-    }
-
-    print_canvas() {
-        const canvas = document.getElementById("fbCanvas");
-        const win = window.open();
-        win.document.write("<html><br><img src='" + canvas.toDataURL() + "'/></html>");
-        win.document.close();
-        win.focus();
-        win.print();
-        win.close();
+        }
     }
 
     restoreBarsAndMatsFromJSON(JSON_obj) {
@@ -650,51 +587,67 @@ export default class FractionBarsCanvas {
         this.mats = [];
         this.selectedBars = [];
         this.selectedMats = [];
-        this.unitBar = null;
-        let len = 0;
-    
-        if (JSON_obj.mBars.length > 0) {
-            for (let i = 0; i < JSON_obj.mBars.length; i++) {
-                len = this.bars.push(Bar.copyFromJSON(JSON_obj.mBars[i]));
-                if (this.bars[len - 1].isUnitBar) {
-                    this.unitBar = this.bars[len - 1];
-                    this.bars[len - 1].fraction = "1/1";
-                }
-            }
-        }
-        if (JSON_obj.mMats.length > 0) {
-            for (let j = 0; j < JSON_obj.mMats.length; j++) {
-                this.mats.push(Mat.copyFromJSON(JSON_obj.mMats[j]));
+
+        for (let i = 0; i < JSON_obj.b.length; i++) {
+            const newBar = new Bar();
+            newBar.restoreFromJSON(JSON_obj.b[i]);
+            this.bars.push(newBar);
+            if (newBar.isUnitBar) {
+                this.unitBar = newBar;
             }
         }
 
+        for (let i = 0; i < JSON_obj.m.length; i++) {
+            const newMat = new Mat();
+            newMat.restoreFromJSON(JSON_obj.m[i]);
+            this.mats.push(newMat);
+        }
+
+        this.currentFill = JSON_obj.cf;
+        this.matFill = JSON_obj.mf;
         this.hiddenButtonsName = JSON_obj.mHidden.slice(0);
         for (let ii = 0; ii < this.hiddenButtonsName.length; ii++) {
-             if (hiddenButtonsName.indexOf(this.hiddenButtonsName[ii]) < 0) {
-                 const hidden = document.getElementById(this.hiddenButtonsName[ii]);
-    
+            if (hiddenButtonsName.indexOf(this.hiddenButtonsName[ii]) < 0) {
+                const hidden = document.getElementById(this.hiddenButtonsName[ii]);
                 $(hidden).hide();
                 hiddenButtonsName.push(this.hiddenButtonsName[ii]);
-                //hiddenButtons.push($(hidden));  //This line was causing a bug, as hidden buttons is a local variable
             }
         }
 
-        this.clearSelection();
+        this.updateSelectionFromState();
         this.refreshCanvas();
     }
 
-    handleFileEvent(file_event) {
-        const file_contents = file_event.target.result;    
-        let text_state = "";
-        let something = null;
-    
-        try {
-            text_state = file_contents.replace(/(\r\n|\n|\r)/gm, "");
-            something = JSON.retrocycle(JSON.parse(text_state));
-        } catch (e) {
-            alert("An error has occurred. \n\n" + "Fraction Bars cannot open this file. \n\n" + e.message);
-            return;
+    setMouseDownLoc(loc) {
+        this.mouseDownLoc = loc;
+        this.mouseLastLoc = loc;
+        if (this.currentAction == "select") {
+            this.check_for_drag = true;
+            this.found_a_drag = false;
         }
-        this.restoreBarsAndMatsFromJSON(something);
+    }
+
+    setMouseUpLoc(loc) {
+        this.mouseUpLoc = loc;
+        if (this.currentAction !== "move") {
+            this.updateCanvas(this.mouseUpLoc);
+        }
+        if ((this.currentAction == "select") && (!this.found_a_drag)) {
+            this.barClickedOn();
+        }
+        this.refreshCanvas();
+        this.clearMouse();
+    }
+
+    setMouseMoveLoc(loc) {
+        if (this.mouseDownLoc !== null) {
+            this.updateCanvas(loc);
+        } else {
+            if (getMarkedIterateFlag() === true) {
+                this.manualSplitPoint = loc;
+                this.refreshCanvas();
+            }
+        }
+        this.mouseLastLoc = loc;
     }
 }
