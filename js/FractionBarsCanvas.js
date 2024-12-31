@@ -582,42 +582,45 @@ export default class FractionBarsCanvas {
         }
     }
 
+
     restoreBarsAndMatsFromJSON(JSON_obj) {
         this.bars = [];
         this.mats = [];
         this.selectedBars = [];
         this.selectedMats = [];
-
-        for (let i = 0; i < JSON_obj.b.length; i++) {
-            const newBar = new Bar();
-            newBar.restoreFromJSON(JSON_obj.b[i]);
-            this.bars.push(newBar);
-            if (newBar.isUnitBar) {
-                this.unitBar = newBar;
+        this.unitBar = null;
+        let len = 0;
+    
+        if (JSON_obj.mBars.length > 0) {
+            for (let i = 0; i < JSON_obj.mBars.length; i++) {
+                len = this.bars.push(Bar.copyFromJSON(JSON_obj.mBars[i]));
+                if (this.bars[len - 1].isUnitBar) {
+                    this.unitBar = this.bars[len - 1];
+                    this.bars[len - 1].fraction = "1/1";
+                }
             }
         }
-
-        for (let i = 0; i < JSON_obj.m.length; i++) {
-            const newMat = new Mat();
-            newMat.restoreFromJSON(JSON_obj.m[i]);
-            this.mats.push(newMat);
+        if (JSON_obj.mMats.length > 0) {
+            for (let j = 0; j < JSON_obj.mMats.length; j++) {
+                this.mats.push(Mat.copyFromJSON(JSON_obj.mMats[j]));
+            }
         }
-
-        this.currentFill = JSON_obj.cf;
-        this.matFill = JSON_obj.mf;
+    
         this.hiddenButtonsName = JSON_obj.mHidden.slice(0);
         for (let ii = 0; ii < this.hiddenButtonsName.length; ii++) {
             if (hiddenButtonsName.indexOf(this.hiddenButtonsName[ii]) < 0) {
                 const hidden = document.getElementById(this.hiddenButtonsName[ii]);
+    
                 $(hidden).hide();
                 hiddenButtonsName.push(this.hiddenButtonsName[ii]);
+                hiddenButtons.push($(hidden));
             }
         }
-
-        this.updateSelectionFromState();
+    
+        this.clearSelection();
         this.refreshCanvas();
     }
-
+    
     setMouseDownLoc(loc) {
         this.mouseDownLoc = loc;
         this.mouseLastLoc = loc;
