@@ -35,4 +35,14 @@ export default class CanvasState {
         }
         this.mHidden = [...fractionBarsCanvas.hiddenButtonsName];
     }
+
+    cacheUndoState(fractionBarsCanvas) {
+        this.grabBarsAndMats(fractionBarsCanvas);
+    }
+
+    finalizeCachedUndoState(fractionBarsCanvas) {
+        const newState = new CanvasState();
+        newState.grabBarsAndMats(fractionBarsCanvas);
+        fractionBarsCanvas.mUndoArray.push(newState);
+    }
 }

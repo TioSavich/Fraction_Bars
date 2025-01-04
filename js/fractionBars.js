@@ -458,7 +458,7 @@ function handleClick(e) {
 
 function handleMouseDown(e) {
     fbCanvasObj.check_for_drag = true;
-    fbCanvasObj.cacheUndoState();
+    fbCanvasObj.canvasState.cacheUndoState(fbCanvasObj);
 
     updateMouseLoc(e, this);
     updateMouseAction('mousedown');
@@ -517,7 +517,7 @@ function handleMouseUp(e) {
     }
 
     if (fbCanvasObj.found_a_drag) {
-        fbCanvasObj.finalizeCachedUndoState();
+        fbCanvasObj.canvasState.finalizeCachedUndoState(fbCanvasObj);
         fbCanvasObj.check_for_drag = false;
     }
 
