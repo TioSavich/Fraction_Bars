@@ -489,6 +489,9 @@ export default class Bar {
     }
 
     static createFromMouse(p1, p2, type, color) {
+        if (!p1 || !p2) {
+            return null;
+        }
         const w = Math.abs(p2.x - p1.x);
         const h = Math.abs(p2.y - p1.y);
         const p = Point.min(p1, p2);
