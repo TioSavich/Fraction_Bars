@@ -1032,7 +1032,7 @@ FractionBarsCanvas.prototype.restoreBarsAndMatsFromJSON = function(JSON_obj) {
 };
 
 FractionBarsCanvas.prototype.print_canvas = function (){
-    var canvas=document.getElementById('fbCanvas');
+    var canvas=document.getElementById("fbCanvas");
 	//var ctx=canvas.canvasContext;
 	var win=window.open();
     win.document.write("<html><br><img src='"+canvas.toDataURL()+"'/></html>");
@@ -1040,154 +1040,85 @@ FractionBarsCanvas.prototype.print_canvas = function (){
 	win.self.print();
   win.location.reload();
 }
-// FractionBarsCanvas.js - Updated for iPad compatibility and improved drag gesture support with visual feedback
 
-// Adding support for touch events and dragging functionality
-let isDragging = false;
-let dragStartX = 0;
-let dragStartY = 0;
+FractionBarsCanvas.prototype.exportHighResPNG = function(filename) {
+	var scale = 3;
+	var canvas = document.getElementById('fbCanvas');
+	var w = canvas.width;
+	var h = canvas.height;
+	// Create a high-res offscreen canvas
+	var exportCanvas = document.createElement('canvas');
+	exportCanvas.width = w * scale;
+	exportCanvas.height = h * scale;
+	var exportCtx = exportCanvas.getContext('2d');
+	// Scale context
+	exportCtx.setTransform(scale, 0, 0, scale, 0, 0);
+	// Redraw everything at high-res
+	this.drawAllToContext(exportCtx);
+	// Export PNG
+	var dataURL = exportCanvas.toDataURL('image/png');
+	var link = document.createElement('a');
+	link.href = dataURL;
+	link.download = filename || 'FractionBars.png';
+	document.body.appendChild(link);
+	link.click();
+	document.body.removeChild(link);
+};
 
-function setupEventListeners(canvas) {
-    // Existing mouse events
-    canvas.addEventListener('mousedown', function(e) {
-        handleMouseDown(e);
-        isDragging = true;
-        dragStartX = e.clientX;
-        dragStartY = e.clientY;
-        displayStatus('Mouse down at: ' + dragStartX + ', ' + dragStartY);
-    });
-    
-    canvas.addEventListener('mousemove', function(e) {
-        if (isDragging) {
-            handleMouseMove(e);
-            drawDragBar(e.clientX, e.clientY);
-            displayStatus('Mouse move at: ' + e.clientX + ', ' + e.clientY);
-        }
-    });
-    
-    canvas.addEventListener('mouseup', function(e) {
-        handleMouseUp(e);
-        isDragging = false;
-        displayStatus('Mouse up at: ' + e.clientX + ', ' + e.clientY);
-    });
-    
-  // Adding support for touch events and dragging functionality
-let isDragging = false;
-let dragStartX = 0;
-let dragStartY = 0;
+// Helper to draw all content to a given context (for export)
+FractionBarsCanvas.prototype.drawAllToContext = function(ctx) {
+	ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+	for (var i = 0; i < this.mats.length; i++) {
+		this.drawMatToContext(ctx, this.mats[i]);
+	}
+	for (var i = 0; i < this.bars.length; i++) {
+		this.drawBarToContext(ctx, this.bars[i]);
+	}
+};
 
-function setupEventListeners(canvas) {
-    // Existing mouse events
-    canvas.addEventListener('mousedown', function(e) {
-        handleMouseDown(e);
-        isDragging = true;
-        dragStartX = e.clientX;
-        dragStartY = e.clientY;
-        displayStatus('Mouse down at: ' + dragStartX + ', ' + dragStartY);
-    });
-    
-    canvas.addEventListener('mousemove', function(e) {
-        if (isDragging) {
-            handleMouseMove(e);
-            drawDragBar(e.clientX, e.clientY);
-            displayStatus('Mouse move at: ' + e.clientX + ', ' + e.clientY);
-        }
-    });
-    
-    canvas.addEventListener('mouseup', function(e) {
-        handleMouseUp(e);
-        isDragging = false;
-        displayStatus('Mouse up at: ' + e.clientX + ', ' + e.clientY);
-    });
-    
-    // Adding touch events for iPad
-    canvas.addEventListener('touchstart', function(e) {
-        e.preventDefault();
-        disablePageScrolling();
-        const touchEvent = convertTouchToMouseEvent(e);
-        handleMouseDown(touchEvent);
-        isDragging = true;
-        dragStartX = touchEvent.clientX;
-        dragStartY = touchEvent.clientY;
-        displayStatus('Touch start at: ' + dragStartX + ', ' + dragStartY);
-    });
-    
-    canvas.addEventListener('touchmove', function(e) {
-        e.preventDefault();
-        if (isDragging) {
-            const touchEvent = convertTouchToMouseEvent(e);
-            handleMouseMove(touchEvent);
-            drawDragBar(touchEvent.clientX, touchEvent.clientY);
-            displayStatus('Touch move at: ' + touchEvent.clientX + ', ' + touchEvent.clientY);
-        }
-    });
-    
-    canvas.addEventListener('touchend', function(e) {
-        e.preventDefault();
-        handleMouseUp(convertTouchToMouseEvent(e));
-        isDragging = false;
-        enablePageScrolling();
-        displayStatus('Touch end');
-    });
-}
-const canvas = document.getElementById('fbCanvas');
-setupEventListeners(canvas)
-	
-// Utility function to convert touch events to mouse events
-function convertTouchToMouseEvent(touchEvent) {
-    const touch = touchEvent.touches[0] || touchEvent.changedTouches[0];
-    return {
-        clientX: touch.clientX,
-        clientY: touch.clientY,
-        button: 0 // Simulate left mouse button
-    };
-}
+FractionBarsCanvas.prototype.drawBarToContext = function(ctx, b) {
+	ctx.save();
+	ctx.fillStyle = b.color;
+	ctx.fillRect(b.x + 0.5, b.y + 0.5, b.w, b.h);
+	ctx.strokeStyle = '#FF0000';
+	if (b.splits.length > 0) {
+		for (var i = 0; i < b.splits.length; i++) {
+			ctx.fillStyle = b.splits[i].color;
+			ctx.fillRect(b.x + b.splits[i].x + 0.5, b.y + b.splits[i].y + 0.5, b.splits[i].w, b.splits[i].h);
+			ctx.strokeStyle = '#000000';
+			ctx.strokeRect(b.x + b.splits[i].x + 0.5, b.y + b.splits[i].y + 0.5, b.splits[i].w, b.splits[i].h);
+			if (b.splits[i].isSelected === true) {
+				var xcenter = b.splits[i].x + (b.splits[i].w / 2);
+				var ycenter = b.splits[i].y + (b.splits[i].h / 2);
+				ctx.strokeRect(b.x + xcenter - 2, b.y + ycenter - 2, 4, 4);
+			}
+		}
+	}
+	ctx.fillStyle = b.color;
+	ctx.strokeStyle = '#000000';
+	if (b.isSelected) {
+		ctx.lineWidth = 2.5;
+	}
+	ctx.strokeRect(b.x + 0.5, b.y + 0.5, b.w, b.h);
+	ctx.lineWidth = 1;
+	ctx.fillStyle = '#000000';
+	ctx.font = '9pt Verdana';
+	if (b.isUnitBar) {
+		ctx.fillText('Unit Bar', b.x, b.y + b.h + 15);
+	}
+	var fractionStringMetrics = ctx.measureText(b.fraction);
+	ctx.fillText(b.fraction, b.x + b.w - fractionStringMetrics.width - 5, b.y - 5);
+	var labelStringMetrics = ctx.measureText(b.label);
+	ctx.fillText(b.label, b.x + 5, b.y + b.h - 5);
+	ctx.fillStyle = this.currentFill;
+	ctx.restore();
+};
 
-// Utility functions to disable and enable page scrolling
-function disablePageScrolling() {
-    document.body.style.overflow = 'hidden';
-}
-
-function enablePageScrolling() {
-    document.body.style.overflow = 'auto';
-}
-
-// Utility functions to disable and enable page scrolling
-function disablePageScrolling() {
-    document.body.style.overflow = 'hidden';
-}
-
-function enablePageScrolling() {
-    document.body.style.overflow = 'auto';
-}
-
-// Function to display status messages directly on the canvas for debugging
-function displayStatus(message) {
-    const canvas = document.getElementById('fractionBarsCanvas');
-    if (canvas) {
-        const ctx = canvas.getContext('2d');
-        if (ctx) {
-            ctx.clearRect(0, canvas.height - 30, canvas.width, 30); // Clear the status area
-            ctx.fillStyle = '#000';
-            ctx.font = '16px Arial';
-            ctx.fillText(message, 10, canvas.height - 10);
-        }
-    }
-}
-
-// Function to draw a bar based on drag gesture
-function drawDragBar(currentX, currentY) {
-    const canvas = document.getElementById('fractionBarsCanvas');
-    if (canvas) {
-        const ctx = canvas.getContext('2d');
-        if (ctx) {
-            ctx.clearRect(0, 0, canvas.width, canvas.height - 30); // Clear the canvas except for the status area
-            drawFractionBars(); // Redraw existing bars
-            // Draw new bar based on drag start and current position
-            ctx.fillStyle = '#FF5733';
-            const width = currentX - dragStartX;
-            const height = currentY - dragStartY;
-            ctx.fillRect(dragStartX, dragStartY, width, height);
-        }
-    }
-}
+FractionBarsCanvas.prototype.drawMatToContext = function(ctx, b) {
+	ctx.save();
+	ctx.fillStyle = b.color;
+	ctx.fillRect(b.x + 0.5, b.y + 0.5, b.w, b.h);
+	ctx.strokeStyle = '#000000';
+	ctx.strokeRect(b.x + 0.5, b.y + 0.5, b.w, b.h);
+	ctx.restore();
+};

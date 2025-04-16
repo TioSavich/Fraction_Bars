@@ -37,10 +37,13 @@ Point.prototype.isOnLine = function(line) {
 // static methods
 
 Point.createFromMouseEvent = function(e, elem) {
-	var p = new Point() ;
-	p.x = Math.round((e.clientX - elem.position().left ) + window.pageXOffset) ;
-	p.y = Math.round((e.clientY - elem.position().top) + window.pageYOffset) ;
-	return p ;
+	var p = new Point();
+	// Support both mouse and normalized touch events
+	var x = (typeof e.clientX !== 'undefined') ? e.clientX : (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
+	var y = (typeof e.clientY !== 'undefined') ? e.clientY : (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
+	p.x = Math.round((x - elem.position().left) + window.pageXOffset);
+	p.y = Math.round((y - elem.position().top) + window.pageYOffset);
+	return p;
 }
 
 Point.subtract = function(p1, p2) {
