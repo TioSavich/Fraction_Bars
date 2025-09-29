@@ -1,0 +1,78 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+\PYG{c+c1}{// Copyright University of Massachusetts Dartmouth 2013}
+\PYG{c+c1}{// }
+\PYG{c+c1}{// Designed and built by James P. Burke and Jason Orrill}
+\PYG{c+c1}{// Modified and developed by Hakan Sandir}
+\PYG{c+c1}{//}
+\PYG{c+c1}{// This Javascript version of Fraction Bars is based on }
+\PYG{c+c1}{// the Transparent Media desktop version of Fraction Bars, }
+\PYG{c+c1}{// which in turn was based on the original TIMA Bars software }
+\PYG{c+c1}{// by John Olive and Leslie Steffe. }
+\PYG{c+c1}{// We thank them for allowing us to update that product.}
+
+
+
+\PYG{k+kd}{function}\PYG{+w}{ }\PYG{n+nx}{Point}\PYG{p}{()}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{	}\PYG{k}{this}\PYG{p}{.}\PYG{n+nx}{x}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{k+kc}{null}\PYG{+w}{ }\PYG{p}{;}
+\PYG{+w}{	}\PYG{k}{this}\PYG{p}{.}\PYG{n+nx}{y}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{k+kc}{null}\PYG{+w}{ }\PYG{p}{;}
+\PYG{p}{\PYGZcb{}}
+
+\PYG{n+nx}{Point}\PYG{p}{.}\PYG{n+nx}{prototype}\PYG{p}{.}\PYG{n+nx}{equals}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{k+kd}{function}\PYG{p}{(}\PYG{n+nx}{p}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{	}\PYG{k+kd}{var}\PYG{+w}{ }\PYG{n+nx}{\PYGZus{}output}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{k+kc}{false}\PYG{+w}{ }\PYG{p}{;}
+\PYG{+w}{	}\PYG{k}{if}\PYG{p}{(}\PYG{+w}{ }\PYG{n+nx}{p}\PYG{+w}{ }\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{		}\PYG{n+nx}{\PYGZus{}output}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{p}{(}\PYG{n+nx}{p}\PYG{p}{.}\PYG{n+nx}{x}\PYG{+w}{ }\PYG{o}{==}\PYG{+w}{ }\PYG{k}{this}\PYG{p}{.}\PYG{n+nx}{x}\PYG{+w}{ }\PYG{o}{\PYGZam{}\PYGZam{}}\PYG{+w}{ }\PYG{n+nx}{p}\PYG{p}{.}\PYG{n+nx}{y}\PYG{+w}{ }\PYG{o}{==}\PYG{+w}{ }\PYG{k}{this}\PYG{p}{.}\PYG{n+nx}{y}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{;}
+\PYG{+w}{	}\PYG{p}{\PYGZcb{}}
+\PYG{+w}{	}\PYG{k}{return}\PYG{+w}{ }\PYG{n+nx}{\PYGZus{}output}\PYG{+w}{ }\PYG{p}{;}
+\PYG{p}{\PYGZcb{};}
+
+\PYG{n+nx}{Point}\PYG{p}{.}\PYG{n+nx}{prototype}\PYG{p}{.}\PYG{n+nx}{isOnLine}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{k+kd}{function}\PYG{p}{(}\PYG{n+nx}{line}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{	}\PYG{k+kd}{var}\PYG{+w}{ }\PYG{n+nx}{onLine}\PYG{+w}{ }\PYG{p}{;}
+\PYG{+w}{	}\PYG{k}{if}\PYG{+w}{ }\PYG{p}{(}\PYG{n+nx}{line}\PYG{p}{.}\PYG{n+nx}{x1}\PYG{+w}{ }\PYG{o}{==}\PYG{+w}{ }\PYG{n+nx}{line}\PYG{p}{.}\PYG{n+nx}{x2}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{		}\PYG{n+nx}{isOnLine}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{p}{(}\PYG{k}{this}\PYG{p}{.}\PYG{n+nx}{x}\PYG{+w}{ }\PYG{o}{==}\PYG{+w}{ }\PYG{n+nx}{line}\PYG{p}{.}\PYG{n+nx}{x1}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{\PYGZam{}\PYGZam{}}\PYG{+w}{ }\PYG{p}{(}\PYG{k}{this}\PYG{p}{.}\PYG{n+nx}{y}\PYG{+w}{ }\PYG{o}{\PYGZgt{}=}\PYG{+w}{ }\PYG{n+nb}{Math}\PYG{p}{.}\PYG{n+nx}{min}\PYG{p}{(}\PYG{n+nx}{line}\PYG{p}{.}\PYG{n+nx}{y1}\PYG{p}{,}\PYG{+w}{ }\PYG{n+nx}{line}\PYG{p}{.}\PYG{n+nx}{y2}\PYG{p}{))}\PYG{+w}{ }\PYG{o}{\PYGZam{}\PYGZam{}}\PYG{+w}{ }\PYG{p}{(}\PYG{k}{this}\PYG{p}{.}\PYG{n+nx}{y}\PYG{+w}{ }\PYG{o}{\PYGZlt{}=}\PYG{+w}{ }\PYG{n+nb}{Math}\PYG{p}{.}\PYG{n+nx}{max}\PYG{p}{(}\PYG{n+nx}{line}\PYG{p}{.}\PYG{n+nx}{y1}\PYG{p}{,}\PYG{+w}{ }\PYG{n+nx}{line}\PYG{p}{.}\PYG{n+nx}{y2}\PYG{p}{))}\PYG{+w}{ }\PYG{p}{;}
+\PYG{+w}{	}\PYG{p}{\PYGZcb{}}\PYG{+w}{ }\PYG{k}{else}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{		}\PYG{n+nx}{isOnLine}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{p}{(}\PYG{k}{this}\PYG{p}{.}\PYG{n+nx}{y}\PYG{+w}{ }\PYG{o}{==}\PYG{+w}{ }\PYG{n+nx}{line}\PYG{p}{.}\PYG{n+nx}{y1}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{\PYGZam{}\PYGZam{}}\PYG{+w}{ }\PYG{p}{(}\PYG{k}{this}\PYG{p}{.}\PYG{n+nx}{x}\PYG{+w}{ }\PYG{o}{\PYGZgt{}=}\PYG{+w}{ }\PYG{n+nb}{Math}\PYG{p}{.}\PYG{n+nx}{min}\PYG{p}{(}\PYG{n+nx}{line}\PYG{p}{.}\PYG{n+nx}{x1}\PYG{p}{,}\PYG{+w}{ }\PYG{n+nx}{line}\PYG{p}{.}\PYG{n+nx}{x2}\PYG{p}{))}\PYG{+w}{ }\PYG{o}{\PYGZam{}\PYGZam{}}\PYG{+w}{ }\PYG{p}{(}\PYG{k}{this}\PYG{p}{.}\PYG{n+nx}{x}\PYG{+w}{ }\PYG{o}{\PYGZlt{}=}\PYG{+w}{ }\PYG{n+nb}{Math}\PYG{p}{.}\PYG{n+nx}{max}\PYG{p}{(}\PYG{n+nx}{line}\PYG{p}{.}\PYG{n+nx}{x1}\PYG{p}{,}\PYG{+w}{ }\PYG{n+nx}{line}\PYG{p}{.}\PYG{n+nx}{x2}\PYG{p}{))}\PYG{+w}{ }\PYG{p}{;}
+\PYG{+w}{	}\PYG{p}{\PYGZcb{}}
+\PYG{+w}{	}\PYG{k}{return}\PYG{+w}{ }\PYG{n+nx}{isOnLine}\PYG{+w}{ }\PYG{p}{;}
+\PYG{p}{\PYGZcb{};}
+
+\PYG{c+c1}{// static methods}
+
+\PYG{n+nx}{Point}\PYG{p}{.}\PYG{n+nx}{createFromMouseEvent}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{k+kd}{function}\PYG{p}{(}\PYG{n+nx}{e}\PYG{p}{,}\PYG{+w}{ }\PYG{n+nx}{elem}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{	}\PYG{k+kd}{var}\PYG{+w}{ }\PYG{n+nx}{p}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{o+ow}{new}\PYG{+w}{ }\PYG{n+nx}{Point}\PYG{p}{();}
+\PYG{+w}{	}\PYG{c+c1}{// Support both mouse and normalized touch events}
+\PYG{+w}{	}\PYG{k+kd}{var}\PYG{+w}{ }\PYG{n+nx}{x}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{p}{(}\PYG{o+ow}{typeof}\PYG{+w}{ }\PYG{n+nx}{e}\PYG{p}{.}\PYG{n+nx}{clientX}\PYG{+w}{ }\PYG{o}{!==}\PYG{+w}{ }\PYG{l+s+s1}{\PYGZsq{}undefined\PYGZsq{}}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{?}\PYG{+w}{ }\PYG{n+nx}{e}\PYG{p}{.}\PYG{n+nx}{clientX}\PYG{+w}{ }\PYG{o}{:}\PYG{+w}{ }\PYG{p}{(}\PYG{n+nx}{e}\PYG{p}{.}\PYG{n+nx}{touches}\PYG{+w}{ }\PYG{o}{\PYGZam{}\PYGZam{}}\PYG{+w}{ }\PYG{n+nx}{e}\PYG{p}{.}\PYG{n+nx}{touches}\PYG{p}{[}\PYG{l+m+mf}{0}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{?}\PYG{+w}{ }\PYG{n+nx}{e}\PYG{p}{.}\PYG{n+nx}{touches}\PYG{p}{[}\PYG{l+m+mf}{0}\PYG{p}{].}\PYG{n+nx}{clientX}\PYG{+w}{ }\PYG{o}{:}\PYG{+w}{ }\PYG{l+m+mf}{0}\PYG{p}{);}
+\PYG{+w}{	}\PYG{k+kd}{var}\PYG{+w}{ }\PYG{n+nx}{y}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{p}{(}\PYG{o+ow}{typeof}\PYG{+w}{ }\PYG{n+nx}{e}\PYG{p}{.}\PYG{n+nx}{clientY}\PYG{+w}{ }\PYG{o}{!==}\PYG{+w}{ }\PYG{l+s+s1}{\PYGZsq{}undefined\PYGZsq{}}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{?}\PYG{+w}{ }\PYG{n+nx}{e}\PYG{p}{.}\PYG{n+nx}{clientY}\PYG{+w}{ }\PYG{o}{:}\PYG{+w}{ }\PYG{p}{(}\PYG{n+nx}{e}\PYG{p}{.}\PYG{n+nx}{touches}\PYG{+w}{ }\PYG{o}{\PYGZam{}\PYGZam{}}\PYG{+w}{ }\PYG{n+nx}{e}\PYG{p}{.}\PYG{n+nx}{touches}\PYG{p}{[}\PYG{l+m+mf}{0}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{?}\PYG{+w}{ }\PYG{n+nx}{e}\PYG{p}{.}\PYG{n+nx}{touches}\PYG{p}{[}\PYG{l+m+mf}{0}\PYG{p}{].}\PYG{n+nx}{clientY}\PYG{+w}{ }\PYG{o}{:}\PYG{+w}{ }\PYG{l+m+mf}{0}\PYG{p}{);}
+\PYG{+w}{	}\PYG{n+nx}{p}\PYG{p}{.}\PYG{n+nx}{x}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nb}{Math}\PYG{p}{.}\PYG{n+nx}{round}\PYG{p}{((}\PYG{n+nx}{x}\PYG{+w}{ }\PYG{o}{\PYGZhy{}}\PYG{+w}{ }\PYG{n+nx}{elem}\PYG{p}{.}\PYG{n+nx}{position}\PYG{p}{().}\PYG{n+nx}{left}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{+}\PYG{+w}{ }\PYG{n+nb}{window}\PYG{p}{.}\PYG{n+nx}{pageXOffset}\PYG{p}{);}
+\PYG{+w}{	}\PYG{n+nx}{p}\PYG{p}{.}\PYG{n+nx}{y}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nb}{Math}\PYG{p}{.}\PYG{n+nx}{round}\PYG{p}{((}\PYG{n+nx}{y}\PYG{+w}{ }\PYG{o}{\PYGZhy{}}\PYG{+w}{ }\PYG{n+nx}{elem}\PYG{p}{.}\PYG{n+nx}{position}\PYG{p}{().}\PYG{n+nx}{top}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{+}\PYG{+w}{ }\PYG{n+nb}{window}\PYG{p}{.}\PYG{n+nx}{pageYOffset}\PYG{p}{);}
+\PYG{+w}{	}\PYG{k}{return}\PYG{+w}{ }\PYG{n+nx}{p}\PYG{p}{;}
+\PYG{p}{\PYGZcb{}}
+
+\PYG{n+nx}{Point}\PYG{p}{.}\PYG{n+nx}{subtract}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{k+kd}{function}\PYG{p}{(}\PYG{n+nx}{p1}\PYG{p}{,}\PYG{+w}{ }\PYG{n+nx}{p2}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{	}\PYG{k+kd}{var}\PYG{+w}{ }\PYG{n+nx}{p}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{o+ow}{new}\PYG{+w}{ }\PYG{n+nx}{Point}\PYG{p}{()}\PYG{+w}{ }\PYG{p}{;}
+\PYG{+w}{	}\PYG{n+nx}{p}\PYG{p}{.}\PYG{n+nx}{x}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nx}{p1}\PYG{p}{.}\PYG{n+nx}{x}\PYG{+w}{ }\PYG{o}{\PYGZhy{}}\PYG{+w}{ }\PYG{n+nx}{p2}\PYG{p}{.}\PYG{n+nx}{x}\PYG{+w}{ }\PYG{p}{;}
+\PYG{+w}{	}\PYG{n+nx}{p}\PYG{p}{.}\PYG{n+nx}{y}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nx}{p1}\PYG{p}{.}\PYG{n+nx}{y}\PYG{+w}{ }\PYG{o}{\PYGZhy{}}\PYG{+w}{ }\PYG{n+nx}{p2}\PYG{p}{.}\PYG{n+nx}{y}\PYG{+w}{ }\PYG{p}{;}
+\PYG{+w}{	}\PYG{k}{return}\PYG{+w}{ }\PYG{n+nx}{p}\PYG{+w}{ }\PYG{p}{;}
+\PYG{p}{\PYGZcb{}}
+
+\PYG{n+nx}{Point}\PYG{p}{.}\PYG{n+nx}{add}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{k+kd}{function}\PYG{p}{(}\PYG{n+nx}{p1}\PYG{p}{,}\PYG{+w}{ }\PYG{n+nx}{p2}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{	}\PYG{k+kd}{var}\PYG{+w}{ }\PYG{n+nx}{p}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{o+ow}{new}\PYG{+w}{ }\PYG{n+nx}{Point}\PYG{p}{()}\PYG{+w}{ }\PYG{p}{;}
+\PYG{+w}{	}\PYG{n+nx}{p}\PYG{p}{.}\PYG{n+nx}{x}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nx}{p1}\PYG{p}{.}\PYG{n+nx}{x}\PYG{+w}{ }\PYG{o}{+}\PYG{+w}{ }\PYG{n+nx}{p2}\PYG{p}{.}\PYG{n+nx}{x}\PYG{+w}{ }\PYG{p}{;}
+\PYG{+w}{	}\PYG{n+nx}{p}\PYG{p}{.}\PYG{n+nx}{y}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nx}{p1}\PYG{p}{.}\PYG{n+nx}{y}\PYG{+w}{ }\PYG{o}{+}\PYG{+w}{ }\PYG{n+nx}{p2}\PYG{p}{.}\PYG{n+nx}{y}\PYG{+w}{ }\PYG{p}{;}
+\PYG{+w}{	}\PYG{k}{return}\PYG{+w}{ }\PYG{n+nx}{p}\PYG{+w}{ }\PYG{p}{;}
+
+\PYG{p}{\PYGZcb{}}
+
+\PYG{n+nx}{Point}\PYG{p}{.}\PYG{n+nx}{multiply}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{k+kd}{function}\PYG{p}{(}\PYG{n+nx}{p1}\PYG{p}{,}\PYG{+w}{ }\PYG{n+nx}{p2}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{	}\PYG{k+kd}{var}\PYG{+w}{ }\PYG{n+nx}{p}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{o+ow}{new}\PYG{+w}{ }\PYG{n+nx}{Point}\PYG{p}{()}\PYG{+w}{ }\PYG{p}{;}
+\PYG{+w}{	}\PYG{n+nx}{p}\PYG{p}{.}\PYG{n+nx}{x}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nx}{p1}\PYG{p}{.}\PYG{n+nx}{x}\PYG{+w}{ }\PYG{o}{*}\PYG{+w}{ }\PYG{n+nx}{p2}\PYG{p}{.}\PYG{n+nx}{x}\PYG{+w}{ }\PYG{p}{;}
+\PYG{+w}{	}\PYG{n+nx}{p}\PYG{p}{.}\PYG{n+nx}{y}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nx}{p1}\PYG{p}{.}\PYG{n+nx}{y}\PYG{+w}{ }\PYG{o}{*}\PYG{+w}{ }\PYG{n+nx}{p2}\PYG{p}{.}\PYG{n+nx}{y}\PYG{+w}{ }\PYG{p}{;}
+\PYG{+w}{	}\PYG{k}{return}\PYG{+w}{ }\PYG{n+nx}{p}\PYG{+w}{ }\PYG{p}{;}
+\PYG{p}{\PYGZcb{}}
+
+\PYG{n+nx}{Point}\PYG{p}{.}\PYG{n+nx}{min}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{k+kd}{function}\PYG{p}{(}\PYG{+w}{ }\PYG{n+nx}{p1}\PYG{p}{,}\PYG{+w}{ }\PYG{n+nx}{p2}\PYG{+w}{ }\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{	}\PYG{k+kd}{var}\PYG{+w}{ }\PYG{n+nx}{p}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{o+ow}{new}\PYG{+w}{ }\PYG{n+nx}{Point}\PYG{p}{()}\PYG{+w}{ }\PYG{p}{;}
+\PYG{+w}{	}\PYG{n+nx}{p}\PYG{p}{.}\PYG{n+nx}{x}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nb}{Math}\PYG{p}{.}\PYG{n+nx}{min}\PYG{p}{(}\PYG{n+nx}{p1}\PYG{p}{.}\PYG{n+nx}{x}\PYG{p}{,}\PYG{+w}{ }\PYG{n+nx}{p2}\PYG{p}{.}\PYG{n+nx}{x}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{;}
+\PYG{+w}{	}\PYG{n+nx}{p}\PYG{p}{.}\PYG{n+nx}{y}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nb}{Math}\PYG{p}{.}\PYG{n+nx}{min}\PYG{p}{(}\PYG{n+nx}{p1}\PYG{p}{.}\PYG{n+nx}{y}\PYG{p}{,}\PYG{+w}{ }\PYG{n+nx}{p2}\PYG{p}{.}\PYG{n+nx}{y}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{;}
+\PYG{+w}{	}\PYG{k}{return}\PYG{+w}{ }\PYG{n+nx}{p}\PYG{+w}{ }\PYG{p}{;}
+\PYG{p}{\PYGZcb{}}
+\end{MintedVerbatim}

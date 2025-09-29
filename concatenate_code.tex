@@ -1,0 +1,128 @@
+\documentclass{article}
+\usepackage{minted}
+\usepackage[a4paper, margin=1in]{geometry}
+\usepackage{hyperref}
+
+% Configure minted for better line wrapping and formatting
+\setminted{
+    breaklines=true,
+    breakanywhere=true,
+    breakautoindent=true,
+    fontsize=\footnotesize,
+    linenos=true,
+    numbersep=5pt,
+    frame=lines,
+    framesep=2mm
+}
+
+\title{Fraction Bars Project Code}
+\author{GitHub Copilot}
+\date{\today}
+
+\begin{document}
+\maketitle
+\tableofcontents
+\newpage
+
+% ---------------------- Main HTML File ----------------------
+\section{Main HTML File}
+\subsection{Fraction\_Bars.html}
+\inputminted{html}{Fraction_Bars.html}
+
+% ---------------------- JavaScript Files ----------------------
+\section{JavaScript Files}
+\subsection{Core Fraction Bars Logic}
+\subsubsection{fractionBars.js}
+\inputminted{javascript}{Fraction_Bars_files/fractionBars.js}
+
+\subsubsection{FractionBarsCanvas.js}
+\inputminted{javascript}{Fraction_Bars_files/FractionBarsCanvas.js}
+
+\subsection{Object Classes}
+\subsubsection{Bar.js}
+\inputminted{javascript}{Fraction_Bars_files/Bar.js}
+
+\subsubsection{Mat.js}
+\inputminted{javascript}{Fraction_Bars_files/Mat.js}
+
+\subsubsection{Point.js}
+\inputminted{javascript}{Fraction_Bars_files/Point.js}
+
+\subsubsection{Line.js}
+\inputminted{javascript}{Fraction_Bars_files/Line.js}
+
+\subsubsection{Split.js}
+\inputminted{javascript}{Fraction_Bars_files/Split.js}
+
+\subsubsection{Blob.js}
+\inputminted{javascript}{Fraction_Bars_files/Blob.js}
+
+\subsection{UI Components}
+\subsubsection{CanvasState.js}
+\inputminted{javascript}{Fraction_Bars_files/CanvasState.js}
+
+\subsubsection{SplitsWidget.js}
+\inputminted{javascript}{Fraction_Bars_files/SplitsWidget.js}
+
+\subsection{Utility Functions}
+\subsubsection{utilities.js}
+\inputminted{javascript}{Fraction_Bars_files/utilities.js}
+
+\subsubsection{cycle.js}
+\inputminted{javascript}{Fraction_Bars_files/cycle.js}
+
+% ---------------------- CSS Files ----------------------
+\section{CSS Files}
+\subsection{Main Styles}
+\subsubsection{fractionBars.css}
+\inputminted{css}{Fraction_Bars_files/fractionBars.css}
+
+\subsubsection{deneme.css}
+\inputminted{css}{Fraction_Bars_files/deneme.css}
+
+\subsection{Language and UI Styles}
+\subsubsection{lang\_eng.css}
+\inputminted{css}{Fraction_Bars_files/lang_eng.css}
+
+% ---------------------- External Libraries (Excluded) ----------------------
+% Note: Minified external libraries are excluded to avoid LaTeX compilation issues
+% with extremely long lines that exceed buffer limits. These include:
+% - FileSaver.min.js
+% - jquery-1.9.1.min.js  
+% - jquery-ui-1.10.3.custom.min.js
+% - jquery-ui-1.10.3.custom.min.css
+
+% ---------------------- AceofBases Program ----------------------
+\section{AceofBases Program}
+\subsection{HTML Files}
+\subsubsection{index.html}
+\inputminted{html}{AceofBases/index.html}
+
+\subsubsection{index\_ace\_of\_bases.html}
+\inputminted{html}{AceofBases/index_ace_of_bases.html}
+
+\subsection{JavaScript Files}
+\subsubsection{script.js}
+\inputminted{javascript}{AceofBases/script.js}
+
+\subsubsection{script\_ace\_of\_bases.js}
+\inputminted{javascript}{AceofBases/script_ace_of_bases.js}
+
+\subsection{CSS Files}
+\subsubsection{styles.css}
+\inputminted{css}{AceofBases/styles.css}
+
+\subsubsection{styles\_ace\_of\_bases.css}
+\inputminted{css}{AceofBases/styles_ace_of_bases.css}
+
+% ---------------------- Configuration Files ----------------------
+\section{Configuration Files}
+\subsection{Fraction\_Bars.code-workspace}
+\inputminted{json}{Fraction_Bars.code-workspace}
+
+% ---------------------- Exclusions / generated files ----------------------
+% Note: Generated artifacts such as concatenated_code.pdf, .aux, .log, .toc
+% and the internal _minted cache are intentionally excluded to avoid
+% embedding generated LaTeX internals.
+
+\end{document}

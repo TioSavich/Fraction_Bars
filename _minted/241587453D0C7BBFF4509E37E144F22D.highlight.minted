@@ -1,0 +1,70 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+\PYG{c+c1}{// A CanvasState object is used to contain a copy of the hierarchy of all the contents of the}
+\PYG{c+c1}{// FractionBars Canvas. Essentially, it is kind of an epty husk of a canvas with just the bars,}
+\PYG{c+c1}{// mats, and minimum required noformation for performing an \PYGZdq{}undo\PYGZdq{} or a \PYGZdq{}redo\PYGZdq{}}
+
+\PYG{c+c1}{// Copyright University of Massachusetts Dartmouth 2013}
+\PYG{c+c1}{// }
+\PYG{c+c1}{// Designed and built by James P. Burke and Jason Orrill}
+\PYG{c+c1}{// Modified and developed by Hakan Sandir}
+\PYG{c+c1}{//}
+\PYG{c+c1}{// This Javascript version of Fraction Bars is based on }
+\PYG{c+c1}{// the Transparent Media desktop version of Fraction Bars, }
+\PYG{c+c1}{// which in turn was based on the original TIMA Bars software }
+\PYG{c+c1}{// by John Olive and Leslie Steffe. }
+\PYG{c+c1}{// We thank them for allowing us to update that product.}
+
+
+
+\PYG{k+kd}{function}\PYG{+w}{ }\PYG{n+nx}{CanvasState}\PYG{p}{(}\PYG{n+nx}{FBCanvas}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{	}\PYG{k}{this}\PYG{p}{.}\PYG{n+nx}{mFBCanvas}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nx}{FBCanvas}\PYG{+w}{ }\PYG{p}{;}
+\PYG{+w}{	}\PYG{k}{this}\PYG{p}{.}\PYG{n+nx}{canvasState}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{k+kc}{null}\PYG{+w}{ }\PYG{p}{;}
+
+\PYG{+w}{	}\PYG{k}{this}\PYG{p}{.}\PYG{n+nx}{mBars}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{p}{[]}\PYG{+w}{ }\PYG{p}{;}
+\PYG{+w}{	}\PYG{k}{this}\PYG{p}{.}\PYG{n+nx}{mMats}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{p}{[]}\PYG{+w}{ }\PYG{p}{;}
+\PYG{+w}{	}\PYG{k}{this}\PYG{p}{.}\PYG{n+nx}{mUnitBar}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{k+kc}{null}\PYG{+w}{ }\PYG{p}{;}
+\PYG{+w}{	}\PYG{k}{this}\PYG{p}{.}\PYG{n+nx}{mHidden}\PYG{o}{=}\PYG{+w}{ }\PYG{p}{[]}\PYG{+w}{ }\PYG{p}{;}
+\PYG{p}{\PYGZcb{}}
+
+
+
+\PYG{c+c1}{// Also copy mats}
+\PYG{n+nx}{CanvasState}\PYG{p}{.}\PYG{n+nx}{prototype}\PYG{p}{.}\PYG{n+nx}{grabBarsAndMats}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{k+kd}{function}\PYG{p}{()}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+
+\PYG{+w}{	}\PYG{k+kd}{var}\PYG{+w}{ }\PYG{n+nx}{mBars}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{p}{[];}
+\PYG{+w}{	}\PYG{k+kd}{var}\PYG{+w}{ }\PYG{n+nx}{mMats}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{p}{[];}
+\PYG{+w}{	}\PYG{k+kd}{var}\PYG{+w}{ }\PYG{n+nx}{aBar}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{k+kc}{null}\PYG{p}{;}
+\PYG{+w}{	}\PYG{k+kd}{var}\PYG{+w}{ }\PYG{n+nx}{mHidden}\PYG{o}{=}\PYG{p}{[];}
+
+\PYG{+w}{	}\PYG{k}{for}\PYG{p}{(}\PYG{+w}{ }\PYG{k+kd}{var}\PYG{+w}{ }\PYG{n+nx}{i}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mf}{0}\PYG{p}{;}\PYG{+w}{ }\PYG{n+nx}{i}\PYG{+w}{ }\PYG{o}{\PYGZlt{}}\PYG{+w}{ }\PYG{k}{this}\PYG{p}{.}\PYG{n+nx}{mFBCanvas}\PYG{p}{.}\PYG{n+nx}{bars}\PYG{p}{.}\PYG{n+nx}{length}\PYG{p}{;}\PYG{+w}{ }\PYG{n+nx}{i}\PYG{o}{++}\PYG{+w}{ }\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{		}\PYG{n+nx}{aBar}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{k}{this}\PYG{p}{.}\PYG{n+nx}{mFBCanvas}\PYG{p}{.}\PYG{n+nx}{bars}\PYG{p}{[}\PYG{n+nx}{i}\PYG{p}{].}\PYG{n+nx}{copy}\PYG{p}{(}\PYG{k+kc}{false}\PYG{p}{);}
+\PYG{+w}{		}\PYG{k}{this}\PYG{p}{.}\PYG{n+nx}{mBars}\PYG{p}{.}\PYG{n+nx}{push}\PYG{p}{(}\PYG{+w}{ }\PYG{n+nx}{aBar}\PYG{+w}{ }\PYG{p}{)}\PYG{+w}{ }\PYG{p}{;}
+\PYG{+w}{		}\PYG{k}{if}\PYG{+w}{ }\PYG{p}{(}\PYG{k}{this}\PYG{p}{.}\PYG{n+nx}{mFBCanvas}\PYG{p}{.}\PYG{n+nx}{bars}\PYG{p}{[}\PYG{n+nx}{i}\PYG{p}{]}\PYG{+w}{ }\PYG{o}{===}\PYG{+w}{ }\PYG{k}{this}\PYG{p}{.}\PYG{n+nx}{mFBCanvas}\PYG{p}{.}\PYG{n+nx}{unitBar}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{			}\PYG{k}{this}\PYG{p}{.}\PYG{n+nx}{mUnitBar}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nx}{aBar}\PYG{p}{;}\PYG{+w}{ }\PYG{c+c1}{// Remember which copy is a copy of the unit bar, if any.}
+\PYG{+w}{		}\PYG{p}{\PYGZcb{}}
+\PYG{+w}{		}\PYG{k}{if}\PYG{+w}{ }\PYG{p}{(}\PYG{k}{this}\PYG{p}{.}\PYG{n+nx}{mFBCanvas}\PYG{p}{.}\PYG{n+nx}{bars}\PYG{p}{[}\PYG{n+nx}{i}\PYG{p}{].}\PYG{n+nx}{isSelected}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{			}\PYG{n+nx}{aBar}\PYG{p}{.}\PYG{n+nx}{isSelected}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{k+kc}{true}\PYG{p}{;}
+\PYG{+w}{		}\PYG{p}{\PYGZcb{}}\PYG{+w}{ }\PYG{k}{else}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{			}\PYG{n+nx}{aBar}\PYG{p}{.}\PYG{n+nx}{isSelected}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{k+kc}{false}\PYG{p}{;}
+\PYG{+w}{		}\PYG{p}{\PYGZcb{}}
+\PYG{+w}{		}\PYG{k}{if}\PYG{+w}{ }\PYG{p}{(}\PYG{k}{this}\PYG{p}{.}\PYG{n+nx}{mFBCanvas}\PYG{p}{.}\PYG{n+nx}{bars}\PYG{p}{[}\PYG{n+nx}{i}\PYG{p}{].}\PYG{n+nx}{isUnitBar}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{			}\PYG{n+nx}{aBar}\PYG{p}{.}\PYG{n+nx}{isUnitBar}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{k+kc}{true}\PYG{p}{;}
+\PYG{+w}{		}\PYG{p}{\PYGZcb{}}
+\PYG{c+c1}{//		aBar.clearSplitSelection();}
+\PYG{+w}{	}\PYG{p}{\PYGZcb{}}
+
+\PYG{+w}{	}\PYG{k}{for}\PYG{p}{(}\PYG{k+kd}{var}\PYG{+w}{ }\PYG{n+nx}{j}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mf}{0}\PYG{p}{;}\PYG{+w}{ }\PYG{n+nx}{j}\PYG{+w}{ }\PYG{o}{\PYGZlt{}}\PYG{k}{this}\PYG{p}{.}\PYG{n+nx}{mFBCanvas}\PYG{p}{.}\PYG{n+nx}{mats}\PYG{p}{.}\PYG{n+nx}{length}\PYG{p}{;}\PYG{+w}{ }\PYG{n+nx}{j}\PYG{o}{++}\PYG{+w}{ }\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{		}\PYG{k}{this}\PYG{p}{.}\PYG{n+nx}{mMats}\PYG{p}{.}\PYG{n+nx}{push}\PYG{p}{(}\PYG{+w}{ }\PYG{k}{this}\PYG{p}{.}\PYG{n+nx}{mFBCanvas}\PYG{p}{.}\PYG{n+nx}{mats}\PYG{p}{[}\PYG{n+nx}{j}\PYG{p}{].}\PYG{n+nx}{copy}\PYG{p}{(}\PYG{k+kc}{false}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{)}\PYG{+w}{ }\PYG{p}{;}
+\PYG{+w}{	}\PYG{p}{\PYGZcb{}}
+\PYG{+w}{	}\PYG{k}{this}\PYG{p}{.}\PYG{n+nx}{mHidden}\PYG{o}{=}\PYG{n+nx}{hiddenButtonsName}\PYG{p}{.}\PYG{n+nx}{slice}\PYG{p}{(}\PYG{l+m+mf}{0}\PYG{p}{);}
+\PYG{+w}{	}\PYG{k}{if}\PYG{+w}{ }\PYG{p}{(}\PYG{n+nx}{hiddenButtonsName}\PYG{p}{.}\PYG{n+nx}{indexOf}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}tool\PYGZus{}hide\PYGZdq{}}\PYG{p}{)}\PYG{o}{\PYGZlt{}}\PYG{l+m+mf}{0}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{	}\PYG{k}{this}\PYG{p}{.}\PYG{n+nx}{mHidden}\PYG{p}{.}\PYG{n+nx}{push}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}tool\PYGZus{}hide\PYGZsq{}}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{;}
+\PYG{+w}{	}\PYG{p}{\PYGZcb{}}
+\PYG{+w}{	}\PYG{k}{if}\PYG{+w}{ }\PYG{p}{(}\PYG{n+nx}{hiddenButtonsName}\PYG{p}{.}\PYG{n+nx}{indexOf}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}action\PYGZus{}show\PYGZdq{}}\PYG{p}{)}\PYG{o}{\PYGZlt{}}\PYG{l+m+mf}{0}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{	}\PYG{k}{this}\PYG{p}{.}\PYG{n+nx}{mHidden}\PYG{p}{.}\PYG{n+nx}{push}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}action\PYGZus{}show\PYGZsq{}}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{;}
+\PYG{+w}{	}\PYG{p}{\PYGZcb{}}
+
+\PYG{p}{\PYGZcb{};}
+
+
+\end{MintedVerbatim}

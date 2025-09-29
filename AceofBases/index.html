@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ace of Base Arithmetic</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f9f9f9;
+        }
+
+        .container {
+            text-align: center;
+            border: 1px solid #ccc;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            background-color: white;
+        }
+
+        canvas {
+            border: 1px solid #000;
+        }
+
+        .controls {
+            margin-top: 20px;
+        }
+
+        button {
+            margin: 5px;
+        }
+
+        .results {
+            margin-top: 20px;
+        }
+
+        .popup {
+            display: none;
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            z-index: 1000;
+        }
+
+        .popup .close {
+            cursor: pointer;
+            background-color: red;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Ace of Base Arithmetic</h1>
+        <p>Circle the number of squares you want to be your grouping unit:</p>
+        <div class="instructions">
+            <p>Drag to select between 2 and 15 cubes:</p>
+            <canvas id="cubeCanvas" width="600" height="400"></canvas>
+        </div>
+        <div class="controls">
+            <p id="selectedUnits">Selected Units: 0</p>
+            <button id="composeButton">Compose</button>
+            <button id="decomposeButton">Decompose</button>
+            <button id="addCubeButton">Add Cube</button>
+            <button id="removeCubeButton">Remove Cube</button>
+        </div>
+        <div class="results">
+            <p id="baseConversion"></p>
+            <p id="baseTenCount"></p>
+        </div>
+    </div>
+    <div id="explanationPopup" class="popup">
+        <p>With bases larger than ten, we need different symbols for the numbers called ten, eleven, twelve, thirteen, fourteen, etc., in base ten. Here is how they are represented:</p>
+        <ul>
+            <li>What is called ten in base ten will be represented with the digit T.</li>
+            <li>What is called eleven in base ten will be represented with the digit E.</li>
+            <li>What is called twelve in base ten will be represented with the digit D.</li>
+            <li>What is called thirteen in base ten will be represented with the digit R.</li>
+            <li>What is called fourteen in base ten will be represented with the digit F.</li>
+        </ul>
+        <button class="close" onclick="document.getElementById('explanationPopup').style.display='none'">Close</button>
+    </div>
+    <div id="overflowPopup" class="popup">
+        <p>Please choose a larger grouping unit.</p>
+        <button class="close" onclick="document.getElementById('overflowPopup').style.display='none'">Close</button>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

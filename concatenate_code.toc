@@ -1,0 +1,37 @@
+\contentsline {section}{\numberline {1}Main HTML File}{2}{section.1}%
+\contentsline {subsection}{\numberline {1.1}Fraction\_Bars.html}{2}{subsection.1.1}%
+\contentsline {section}{\numberline {2}JavaScript Files}{7}{section.2}%
+\contentsline {subsection}{\numberline {2.1}Core Fraction Bars Logic}{7}{subsection.2.1}%
+\contentsline {subsubsection}{\numberline {2.1.1}fractionBars.js}{7}{subsubsection.2.1.1}%
+\contentsline {subsubsection}{\numberline {2.1.2}FractionBarsCanvas.js}{21}{subsubsection.2.1.2}%
+\contentsline {subsection}{\numberline {2.2}Object Classes}{36}{subsection.2.2}%
+\contentsline {subsubsection}{\numberline {2.2.1}Bar.js}{36}{subsubsection.2.2.1}%
+\contentsline {subsubsection}{\numberline {2.2.2}Mat.js}{46}{subsubsection.2.2.2}%
+\contentsline {subsubsection}{\numberline {2.2.3}Point.js}{47}{subsubsection.2.2.3}%
+\contentsline {subsubsection}{\numberline {2.2.4}Line.js}{49}{subsubsection.2.2.4}%
+\contentsline {subsubsection}{\numberline {2.2.5}Split.js}{49}{subsubsection.2.2.5}%
+\contentsline {subsubsection}{\numberline {2.2.6}Blob.js}{50}{subsubsection.2.2.6}%
+\contentsline {subsection}{\numberline {2.3}UI Components}{52}{subsection.2.3}%
+\contentsline {subsubsection}{\numberline {2.3.1}CanvasState.js}{52}{subsubsection.2.3.1}%
+\contentsline {subsubsection}{\numberline {2.3.2}SplitsWidget.js}{53}{subsubsection.2.3.2}%
+\contentsline {subsection}{\numberline {2.4}Utility Functions}{54}{subsection.2.4}%
+\contentsline {subsubsection}{\numberline {2.4.1}utilities.js}{54}{subsubsection.2.4.1}%
+\contentsline {subsubsection}{\numberline {2.4.2}cycle.js}{56}{subsubsection.2.4.2}%
+\contentsline {section}{\numberline {3}CSS Files}{58}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Main Styles}{58}{subsection.3.1}%
+\contentsline {subsubsection}{\numberline {3.1.1}fractionBars.css}{58}{subsubsection.3.1.1}%
+\contentsline {subsubsection}{\numberline {3.1.2}deneme.css}{60}{subsubsection.3.1.2}%
+\contentsline {subsection}{\numberline {3.2}Language and UI Styles}{61}{subsection.3.2}%
+\contentsline {subsubsection}{\numberline {3.2.1}lang\_eng.css}{61}{subsubsection.3.2.1}%
+\contentsline {section}{\numberline {4}AceofBases Program}{62}{section.4}%
+\contentsline {subsection}{\numberline {4.1}HTML Files}{62}{subsection.4.1}%
+\contentsline {subsubsection}{\numberline {4.1.1}index.html}{62}{subsubsection.4.1.1}%
+\contentsline {subsubsection}{\numberline {4.1.2}index\_ace\_of\_bases.html}{63}{subsubsection.4.1.2}%
+\contentsline {subsection}{\numberline {4.2}JavaScript Files}{64}{subsection.4.2}%
+\contentsline {subsubsection}{\numberline {4.2.1}script.js}{64}{subsubsection.4.2.1}%
+\contentsline {subsubsection}{\numberline {4.2.2}script\_ace\_of\_bases.js}{69}{subsubsection.4.2.2}%
+\contentsline {subsection}{\numberline {4.3}CSS Files}{74}{subsection.4.3}%
+\contentsline {subsubsection}{\numberline {4.3.1}styles.css}{74}{subsubsection.4.3.1}%
+\contentsline {subsubsection}{\numberline {4.3.2}styles\_ace\_of\_bases.css}{74}{subsubsection.4.3.2}%
+\contentsline {section}{\numberline {5}Configuration Files}{75}{section.5}%
+\contentsline {subsection}{\numberline {5.1}Fraction\_Bars.code-workspace}{75}{subsection.5.1}%
