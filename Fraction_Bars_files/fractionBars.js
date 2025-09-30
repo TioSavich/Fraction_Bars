@@ -348,17 +348,9 @@ document.getElementById('fbCanvas').style.backgroundColor = $(this).css('backgro
 					fbCanvasObj.addUndoState();
 					fbCanvasObj.editLabel() ;
 					break ;
-				case 'split':
-					fbCanvasObj.addUndoState();
-					fbCanvasObj.split(splitWidgetObj) ;
-					break ;
-				case 'iterate':
-					fbCanvasObj.addUndoState();
-					fbCanvasObj.iterate() ;
-					break ;
-				case 'properties':
-					fbCanvasObj.properties();
-					break ;
+				// case 'split': is now handled by ToolbarComponent.js
+				// case 'iterate': is now handled by ToolbarComponent.js
+				// case 'properties': is now handled by ToolbarComponent.js
 			}
 		}
 
@@ -379,8 +371,9 @@ document.getElementById('fbCanvas').style.backgroundColor = $(this).css('backgro
 		}
 
 		if( e.ctrlKey && e.keyCode==80) {
-			fbCanvasObj.properties();
-			fbCanvasObj.refreshCanvas();
+			// This shortcut is now handled by the new ToolbarComponent
+			// fbCanvasObj.properties();
+			// fbCanvasObj.refreshCanvas();
 		}
 
 		if( e.ctrlKey && e.keyCode==83) {
@@ -427,129 +420,13 @@ document.getElementById('fbCanvas').style.backgroundColor = $(this).css('backgro
 
 
 
-	$( "#dialog-splits" ).dialog({
-			height: 300,
-			width: 400,
-			resizable: false,
-			modal: true,
-			buttons: [
-				{
-					text: "Ok",
-					click: function() {
-						var num_splits = $("#split-slider-field").val();
-						var whole = $("input[type='radio'][name='whole_part']:checked").val();
-						var direction="Vertical";
-						if(Utilities.flag[1])
-						{
-							direction =  $("input[type='radio'][name='vert_horiz']:checked").val();
-						}
+	// [REMOVED] The #dialog-splits initialization is now handled by the new native dialog implementation.
 
-						fbCanvasObj.makeSplits(num_splits, direction, whole);
-						$( this ).dialog( "close" );
-					}
-				},
-				{
-					text: "Cancel",
-					click: function() {
-						$( this ).dialog( "close" );
-					}
-				}
-			],
-			autoOpen: false
-	});
-
-	$( "#dialog-properties" ).dialog({
-			height: 500,
-			width: 400,
-			resizable: false,
-			modal: true,
-			buttons: [
-				{
-					text: "Ok",
-					click: function() {
-						var create_checked = $("input[type='radio'][name='create']:checked").val();
-						splitWidgetObj.vertical=true;
-						if (create_checked == "Same") {
-							Utilities.flag[0]= true;
-						} else if (create_checked == "New") {
-							Utilities.flag[0]= false;}
-
-						var horiz_checked = $("input[type='radio'][name='two_split']:checked").val();
-						if (horiz_checked == "One_horiz") {
-							Utilities.flag[1]= false;
-							document.getElementById("radio_vert").style.display = 'none';
-						} else if (horiz_checked == "Two_horiz") {
-							Utilities.flag[1]= true;
-							document.getElementById("radio_vert").style.display = 'block';
-						}
-
-						var itterate_way_checked = $("input[type='radio'][name='two_ittr']:checked").val();
-						if (itterate_way_checked == "One_way") {
-							Utilities.flag[2]= false;
-							document.getElementById("iterate_vert-horiz").style.display = 'none';
-						} else if (itterate_way_checked == "Two_way") {
-							Utilities.flag[2]= true;
-							document.getElementById("iterate_vert-horiz").style.display = 'block';
-						}
-
-						var language_checked = $("input[type='radio'][name='lang']:checked").val();
-						switch(language_checked) {
-						case 'lang_eng':
-							Utilities.flag[3]= false;
-							document.getElementById('stylesheet').href='css/lang_eng.css';
-							break ;
-						case 'lang_tur':
-							Utilities.flag[3]= true;
-							document.getElementById('stylesheet').href='css/lang_tur.css';
-							break ;
-						}
-
-						$( this ).dialog( "close" );
-					}
-				},
-				{
-					text: "Cancel",
-					click: function() {
-						$( this ).dialog( "close" );
-					}
-				}
-			],
-			autoOpen: false
-	});
+	// [REMOVED] The #dialog-properties initialization is now handled by the new native dialog implementation.
 
 
 
-	$( "#dialog-iterate" ).dialog({
-			height: 300,
-			width: 400,
-			resizable: false,
-			modal: true,
-			buttons: [
-				{
-					text: "Ok",
-					click: function() {
-						var num_iterate = $("#iterate-field").val();
-						if(!Utilities.flag[2])
-						{
-							direction="Horizontal";
-						}
-						else
-						{
-							var direction =  $("input[type='radio'][name='vert_horiz']:checked").val();
-						}
-						fbCanvasObj.makeIterations(num_iterate, direction);
-						$( this ).dialog( "close" );
-					}
-				},
-				{
-					text: "Cancel",
-					click: function() {
-						$( this ).dialog( "close" );
-					}
-				}
-			],
-			autoOpen: false
-	});
+	// [REMOVED] The #dialog-iterate initialization is now handled by the new native dialog implementation.
 
 $( "#dialog-make" ).dialog({
 			height: 300,
@@ -602,15 +479,7 @@ $( "#dialog-make" ).dialog({
 			autoOpen: false
 	});
 
-	$( "#split-slider" ).slider({
-			value:2,
-			min: 2,
-			max: 20,
-			step: 1,
-			slide: function( event, ui ) {
-				$( "#split-slider-field" ).val( ui.value );
-			}
-	});
+	// [REMOVED] The #split-slider initialization is now handled by a native <input type="range"> element.
 
 	$( "#dialog-hidden" ).dialog({
 			height: 250,
