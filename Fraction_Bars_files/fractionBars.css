@@ -29,6 +29,7 @@ a {
 #fbCanvas {
 	background-color: #EFEFEF;
 	border: 1px gray groove;
+	touch-action: none;
 }
 #tools {
 	float:left ;

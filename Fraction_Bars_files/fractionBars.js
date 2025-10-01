@@ -9,25 +9,6 @@
 // by John Olive and Leslie Steffe.
 // We thank them for allowing us to update that product.
 
-
-
-
-/*
-// pull in our other files
-
-// TODO: figure out if this is really a desirable thing to do. I like it in
-// that this approach feels more like other languages, but there are issues
-// with the classes not being available when I expect them to be.
-
-include_js('class/Point.js', 'js/');
-include_js('class/Bar.js', 'js/');
-include_js('class/Mat.js', 'js/');
-include_js('class/Split.js', 'js/');
-include_js('class/Line.js', 'js/');
-include_js('class/FractionBarsCanvas.js', 'js/');
-
-*/
-
 var point1 = null ;
 var point2 = null;
 var fbContext = null ;
@@ -39,36 +20,37 @@ var fracEvent = null;
 
 splitWidgetObj = null;
 
-$(document).ready(function() {
-//first attempt
+document.addEventListener('DOMContentLoaded', function() {
+	//first attempt
 	hideButton("id_filetext");
 	hideButton("action_previous");
 	hideButton("action_next");
 
 
 
-	fbContext = $('#fbCanvas')[0].getContext( '2d' ) ;
+	fbContext = document.getElementById('fbCanvas').getContext('2d');
 	fbCanvasObj = new FractionBarsCanvas(fbContext);
-	splitWidgetContext = $('#split-display')[0].getContext('2d');
-	var splitWidgetObj = new SplitsWidget(splitWidgetContext);
+	splitWidgetContext = document.getElementById('split-display').getContext('2d');
+	splitWidgetObj = new SplitsWidget(splitWidgetContext);
 
 	// High-DPI/Retina support: scale canvas for crisp display
 	var dpr = 3; // 3x for Retina/HiDPI
-	var $canvas = $('#fbCanvas');
-	var cssWidth = $canvas.attr('width');
-	var cssHeight = $canvas.attr('height');
-	$canvas[0].width = cssWidth * dpr;
-	$canvas[0].height = cssHeight * dpr;
-	$canvas.css({ width: cssWidth + 'px', height: cssHeight + 'px' });
+	var canvas = document.getElementById('fbCanvas');
+	var cssWidth = canvas.getAttribute('width');
+	var cssHeight = canvas.getAttribute('height');
+	canvas.width = cssWidth * dpr;
+	canvas.height = cssHeight * dpr;
+	canvas.style.width = cssWidth + 'px';
+	canvas.style.height = cssHeight + 'px';
 	fbContext.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-	$("#split-slider").slider({
-		change: function(event,ui) {
-			splitWidgetObj.handleSliderChange(event, ui);
-		}
+	document.getElementById("split-slider").addEventListener("change", function(event) {
+		splitWidgetObj.handleSliderChange(event, { value: this.value });
 	});
 
-	$("#vert,#horiz").change(handleVertHorizChange);
+	document.getElementById("vert").addEventListener("change", handleVertHorizChange);
+	document.getElementById("horiz").addEventListener("change", handleVertHorizChange);
+
 
 	function handleVertHorizChange(event) {
 		splitWidgetObj.handleVertHorizChange(event);
@@ -77,30 +59,31 @@ $(document).ready(function() {
 
 
 
-	$( "#files" ).change(handleFileSelect);
+	document.getElementById("files").addEventListener("change", handleFileSelect);
 	FBFileReader = new FileReader();
 
 
 
 
 //First attempt
-	$( "#id_filetext" ).change(handleListSelect);
+	document.getElementById("id_filetext").addEventListener("change", handleListSelect);
 //
 
 
-	$('#fbCanvas').dblclick(function() {
+	document.getElementById('fbCanvas').addEventListener('dblclick', function() {
 		var fbImg = fbContext.getImageData(0,0,1000,600) ;
 		fbContext.clearRect(0,0,1000,600) ;
 //		fbContext.restore() ;
 		fbContext.putImageData(fbImg,0,0);
 	});
 
-	$('#fbCanvas').mousemove(function(e) {
+	document.getElementById('fbCanvas').addEventListener('pointermove', function(e) {
+		e.preventDefault();
 		fracEvent = e;
-		updateMouseLoc(e, $(this));
-		updateMouseAction('mousemove');
+		updateMouseLoc(e, this);
+		updateMouseAction('pointermove');
 
-		var p = Point.createFromMouseEvent(e, $(this)) ;
+		var p = Point.createFromMouseEvent(e, this) ;
 
 		if (fbCanvasObj.currentAction == "manualSplit") {
 			fbCanvasObj.manualSplitPoint = p;
@@ -110,21 +93,17 @@ $(document).ready(function() {
 		if(fbCanvasObj.mouseDownLoc !== null) {
 			fbCanvasObj.updateCanvas(p);
 		}
-
-//		if (fbCanvasObj.currentAction == "manualSplit") {
-//			fbCanvasObj.manualSplitXORDraw(p);
-//		}
-
 	});
 
-	$('#fbCanvas').mousedown(function(e) {
-
+	document.getElementById('fbCanvas').addEventListener('pointerdown', function(e) {
+		e.preventDefault();
+		this.setPointerCapture(e.pointerId);
 		fbCanvasObj.check_for_drag = true;
 		fbCanvasObj.cacheUndoState();
 
-		updateMouseLoc(e, $(this));
-		updateMouseAction('mousedown');
-		fbCanvasObj.mouseDownLoc = Point.createFromMouseEvent(e, $(this)) ;
+		updateMouseLoc(e, this);
+		updateMouseAction('pointerdown');
+		fbCanvasObj.mouseDownLoc = Point.createFromMouseEvent(e, this) ;
 		var b = fbCanvasObj.barClickedOn() ;
 		var m = fbCanvasObj.matClickedOn() ;
 
@@ -137,11 +116,11 @@ $(document).ready(function() {
 		} else {
 			// The click is being used to update the selected bars
 			if( b !== null ) {
-				if( $.inArray(b, fbCanvasObj.selectedBars) == -1) { // clicked on bar is not already selected
+				if( !fbCanvasObj.selectedBars.includes(b) ) { // clicked on bar is not already selected
 					if( !Utilities.shiftKeyDown ) {
 						fbCanvasObj.clearSelection();
 					}
-					$.each( fbCanvasObj.selectedBars, function(index, bar) {
+					fbCanvasObj.selectedBars.forEach(function(bar) {
 						bar.clearSplitSelection();
 					});
 					fbCanvasObj.barToFront(b);
@@ -149,7 +128,7 @@ $(document).ready(function() {
 					b.isSelected = true;
 					b.selectSplit(fbCanvasObj.mouseDownLoc);
 				} else {											// clicked bar is already selected
-					$.each( fbCanvasObj.selectedBars, function(index, bar) {
+					fbCanvasObj.selectedBars.forEach(function(bar) {
 						bar.clearSplitSelection();
 					});
 					if( !Utilities.shiftKeyDown ) {
@@ -163,7 +142,7 @@ $(document).ready(function() {
 					fbCanvasObj.clearSelection();
 				}
 			} else if( m !== null ) {
-				if( $.inArray(m, fbCanvasObj.selectedMats) == -1) { // clicked on mat is not already selected
+				if( !fbCanvasObj.selectedMats.includes(m)) { // clicked on mat is not already selected
 					if( !Utilities.shiftKeyDown ) {
 						fbCanvasObj.clearSelection();
 					}
@@ -181,12 +160,12 @@ $(document).ready(function() {
 		}
 	}) ;
 
-	$('#fbCanvas').mouseup(function(e) {
-		updateMouseLoc(e, $(this));
-		updateMouseAction('mouseup');
+	document.getElementById('fbCanvas').addEventListener('pointerup', function(e) {
+		e.preventDefault();
+		updateMouseLoc(e, this);
+		updateMouseAction('pointerup');
 
-		fbCanvasObj.mouseUpLoc = Point.createFromMouseEvent(e, $(this)) ;
-
+		fbCanvasObj.mouseUpLoc = Point.createFromMouseEvent(e, this) ;
 
 		if( fbCanvasObj.currentAction == 'bar' ) {
 			fbCanvasObj.addUndoState();
@@ -199,7 +178,6 @@ $(document).ready(function() {
 			fbCanvasObj.clear_selection_button ();
 		}
 
-
 		if (fbCanvasObj.found_a_drag){
 			fbCanvasObj.finalizeCachedUndoState();
 			fbCanvasObj.check_for_drag = false;
@@ -211,34 +189,43 @@ $(document).ready(function() {
 
 	}) ;
 
-	$('.colorBlock').click(function(e) {
-		fbCanvasObj.setFillColor( $(this).css('background-color'));
-		$('.colorBlock').removeClass('colorSelected');
-		$(this).addClass('colorSelected');
-		fbCanvasObj.updateColorsOfSelectedBars();
-		fbCanvasObj.refreshCanvas();
-	}) ;
+	document.querySelectorAll('.colorBlock').forEach(function(element) {
+		element.addEventListener('click', function(e) {
+			fbCanvasObj.setFillColor( window.getComputedStyle(this).backgroundColor);
+			document.querySelectorAll('.colorBlock').forEach(function(el) {
+				el.classList.remove('colorSelected');
+			});
+			this.classList.add('colorSelected');
+			fbCanvasObj.updateColorsOfSelectedBars();
+			fbCanvasObj.refreshCanvas();
+		});
+	});
 
 //first attempt
-	$('.colorBlock1').click(function(e) {
-document.getElementById('fbCanvas').style.backgroundColor = $(this).css('background-color');
-		$('.colorBlock1').removeClass('colorSelected');
-		$(this).addClass('colorSelected');
-	}) ;
+	document.querySelectorAll('.colorBlock1').forEach(function(element) {
+		element.addEventListener('click', function(e) {
+			document.getElementById('fbCanvas').style.backgroundColor = window.getComputedStyle(this).backgroundColor;
+			document.querySelectorAll('.colorBlock1').forEach(function(el) {
+				el.classList.remove('colorSelected');
+			});
+			this.classList.add('colorSelected');
+		});
+	});
 //
 
 
-	$('a').click(function(e) {
+	document.querySelectorAll('a').forEach(function(element) {
+		element.addEventListener('click', function(e) {
 
-		var thisId = $(this).attr('id') ;
-		if (thisId === null) { return; }
-		var tool_on = false; // just temporarily keeps track of whether we're turning a tool on or off
+			var thisId = this.getAttribute('id') ;
+			if (thisId === null) { return; }
+			var tool_on = false; // just temporarily keeps track of whether we're turning a tool on or off
 
 //		First, handle any hiding, if we're in that mode
 		if ((fbCanvasObj.currentAction == 'hide') && (thisId.indexOf('hide') == -1) ) {
-			$(this).hide();
+			this.style.display = 'none';
 			hiddenButtonsName.push(thisId);
-			hiddenButtons.push($(this));
+			hiddenButtons.push(this);
 			return;
 		}
 
@@ -251,7 +238,7 @@ document.getElementById('fbCanvas').style.backgroundColor = $(this).css('backgro
 			} else {
 				fbCanvasObj.currentAction = thisId.substr(5,thisId.length) ;
 				tool_on = true;
-				$(this).addClass('toolSelected');
+				this.classList.add('toolSelected');
 			}
 			fbCanvasObj.handleToolUpdate(toolName, tool_on);
 			fbCanvasObj.refreshCanvas();
@@ -318,7 +305,7 @@ document.getElementById('fbCanvas').style.backgroundColor = $(this).css('backgro
 					break;
 				case 'open':
 					SaveScreen();
-					resetFormElement($("#files"));
+					resetFormElement(document.getElementById("files"));
 					fbCanvasObj.openFileDialog();
 					break;
 					case 'print':
@@ -348,23 +335,30 @@ document.getElementById('fbCanvas').style.backgroundColor = $(this).css('backgro
 					fbCanvasObj.addUndoState();
 					fbCanvasObj.editLabel() ;
 					break ;
-				// case 'split': is now handled by ToolbarComponent.js
-				// case 'iterate': is now handled by ToolbarComponent.js
-				// case 'properties': is now handled by ToolbarComponent.js
+				case 'split':
+					fbCanvasObj.split(splitWidgetObj);
+					break;
+				case 'iterate':
+					fbCanvasObj.iterate();
+					break;
+				case 'properties':
+					fbCanvasObj.properties();
+					break;
 			}
 		}
 
-	}) ;
+		});
+	});
 
 
-	$(document).keydown(function(e) {
+	document.addEventListener('keydown', function(e) {
 
 		if( e.which == 16 ) {
 			Utilities.shiftKeyDown = true ;
 			fbCanvasObj.refreshCanvas();
 		}
 	});
-	$(document).keyup(function(e) {
+	document.addEventListener('keyup', function(e) {
 		if( e.which == 16 ) {
 			Utilities.shiftKeyDown = false ;
 			fbCanvasObj.refreshCanvas();
@@ -382,7 +376,7 @@ document.getElementById('fbCanvas').style.backgroundColor = $(this).css('backgro
 		}
 
 		if( e.ctrlKey && e.keyCode==72) {
-			//$( "#dialog-hidden" ).dialog('open');
+			//document.getElementById( "#dialog-hidden" ).dialog('open');
 			if(Utilities.ctrlKeyDown){
 				showButton("tool_hide");
 				showButton("action_show");
@@ -403,9 +397,9 @@ document.getElementById('fbCanvas').style.backgroundColor = $(this).css('backgro
 
 	});
 
-	$('#labelInput').keyup( function( e ) {
+	document.getElementById('labelInput').addEventListener('keyup', function( e ) {
 		if( e.which == 13 ) {
-			fbCanvasObj.saveLabel( $('#labelInput').val(), Utilities.USE_CURRENT_SELECTION ) ;
+			fbCanvasObj.saveLabel( this.value, Utilities.USE_CURRENT_SELECTION ) ;
 			fbCanvasObj.hideEditLabel() ;
 			fbCanvasObj.refreshCanvas();
 		}
@@ -413,8 +407,8 @@ document.getElementById('fbCanvas').style.backgroundColor = $(this).css('backgro
 
 	// This gets triggered after we have already cleared out the selection,
 	// so we need to have a way to be sure the LAST selection gets the label.
-	$('#labelInput').blur( function() {
-		fbCanvasObj.saveLabel( $('#labelInput').val(), Utilities.USE_LAST_SELECTION ) ;
+	document.getElementById('labelInput').addEventListener('blur', function() {
+		fbCanvasObj.saveLabel( this.value, Utilities.USE_LAST_SELECTION ) ;
 		fbCanvasObj.hideEditLabel() ;
 	}) ;
 
@@ -428,236 +422,61 @@ document.getElementById('fbCanvas').style.backgroundColor = $(this).css('backgro
 
 	// [REMOVED] The #dialog-iterate initialization is now handled by the new native dialog implementation.
 
-$( "#dialog-make" ).dialog({
-			height: 300,
-			width: 400,
-			resizable: false,
-			modal: true,
-			buttons: [
-				{
-					text: "Ok",
-					click: function() {
-						var num_whole = parseFloat($("#whole-field").val());
-						var num_num = parseFloat($("#num-field").val());
-						var num_denum = parseFloat($("#denum-field").val());
-
-						if(!num_whole)
-						{
-							num_whole=0;
-						}
-						if(!num_denum)
-						{
-							num_denum=1;
-						}
-						if(!num_num)
-						{
-							num_num=0;
-						}
-						num_frac=num_whole + (num_num/num_denum);
-						if (!num_frac)
-						{
-							alert("Please input fraction!");
-						}
-						else
-						{
-							fbCanvasObj.makeMake(num_frac);
-						}
-
-						document.getElementById('whole-field').value="";
-						document.getElementById('num-field').value="";
-						document.getElementById('denum-field').value="";
-						$( this ).dialog( "close" );
-					}
-				},
-				{
-					text: "Cancel",
-					click: function() {
-						$( this ).dialog( "close" );
-					}
-				}
-			],
-			autoOpen: false
+	document.querySelector("#dialog-splits #split-ok-button").addEventListener('click', function() {
+		var num_splits = parseInt(document.getElementById('split-slider-field').value);
+		var vert_horiz = document.querySelector('input[name="vert_horiz"]:checked').value;
+		var whole_part = document.querySelector('input[name="whole_part"]:checked').value;
+		fbCanvasObj.addUndoState();
+		fbCanvasObj.makeSplits(num_splits, vert_horiz, whole_part);
+		document.getElementById('dialog-splits').close();
 	});
 
-	// [REMOVED] The #split-slider initialization is now handled by a native <input type="range"> element.
-
-	$( "#dialog-hidden" ).dialog({
-			height: 250,
-			width: 300,
-			modal: true,
-			buttons: [
-				{
-					text: "Ok",
-					click: function() {
-//////////////////
-
-						$( this ).dialog( "close" );
-					}
-				},
-				{
-					text: "Cancel",
-					click: function() {
-						$( this ).dialog( "close" );
-					}
-				}
-			],
-			autoOpen: false
+	document.querySelector("#dialog-splits #split-cancel-button").addEventListener('click', function() {
+		document.getElementById('dialog-splits').close();
 	});
 
-	$( "#dialog-file" ).dialog({
-			height: 250,
-			width: 300,
-			modal: true,
-			buttons: [
-				{
-					text: "Cancel",
-					click: function() {
-						$( this ).dialog( "close" );
-					}
-				}
-			],
-			autoOpen: false
+	document.querySelector("#dialog-properties button[value='ok']").addEventListener('click', function() {
+		Utilities.flag[0] = document.getElementById("same").checked;
+		Utilities.flag[1] = document.getElementById("two_horiz").checked;
+		document.getElementById('dialog-properties').close();
 	});
 
-	// --- Touch event helpers ---
-	function getTouchPos(e, elem) {
-		var touch = e.originalEvent.touches[0] || e.originalEvent.changedTouches[0];
-		return {
-			x: touch.clientX - elem.position().left,
-			y: touch.clientY - elem.position().top
-		};
-	}
-	function normalizeEvent(e, elem) {
-		if (e.type.startsWith('touch')) {
-			var pos = getTouchPos(e, elem);
-			return {
-				clientX: pos.x + elem.position().left,
-				clientY: pos.y + elem.position().top,
-				which: 1,
-				ctrlKey: e.ctrlKey || false,
-				shiftKey: e.shiftKey || false,
-				preventDefault: function() { e.preventDefault(); }
-			};
-		}
-		return e;
-	}
+	document.querySelector("#dialog-properties button[value='cancel']").addEventListener('click', function() {
+		document.getElementById('dialog-properties').close();
+	});
 
-	// --- Canvas touch events ---
-	$('#fbCanvas').on('touchstart', function(e) {
-		e.preventDefault(); // Prevent scrolling/zooming
-		var ne = normalizeEvent(e, $(this));
-		// Simulate mousedown logic
-		fbCanvasObj.check_for_drag = true;
-		fbCanvasObj.cacheUndoState();
-		updateMouseLoc(ne, $(this));
-		updateMouseAction('mousedown');
-		fbCanvasObj.mouseDownLoc = Point.createFromMouseEvent(ne, $(this));
-		var b = fbCanvasObj.barClickedOn();
-		var m = fbCanvasObj.matClickedOn();
-		// Copy from the mouse handler above
-		if( (fbCanvasObj.currentAction == 'bar') || (fbCanvasObj.currentAction == "mat")) {
-			fbCanvasObj.saveCanvas() ;
-		} else if( fbCanvasObj.currentAction == 'repeat' ) {
-			fbCanvasObj.addUndoState();
-			b.repeat(fbCanvasObj.mouseDownLoc);
-			fbCanvasObj.refreshCanvas();
+	document.querySelector("#dialog-iterate button[value='ok']").addEventListener('click', function() {
+		var num_iterations = parseInt(document.getElementById('iterate-field').value);
+		var vert_horiz = document.querySelector('input[name="vert_horiz_iterate"]:checked').value;
+		fbCanvasObj.addUndoState();
+		fbCanvasObj.makeIterations(num_iterations, vert_horiz);
+		document.getElementById('dialog-iterate').close();
+	});
+
+	document.querySelector("#dialog-iterate button[value='cancel']").addEventListener('click', function() {
+		document.getElementById('dialog-iterate').close();
+	});
+
+	document.querySelector("#dialog-make button[value='ok']").addEventListener('click', function() {
+		var num_whole = parseFloat(document.getElementById("whole-field").value) || 0;
+		var num_num = parseFloat(document.getElementById("num-field").value) || 0;
+		var num_denum = parseFloat(document.getElementById("denum-field").value) || 1;
+
+		var num_frac = num_whole + (num_num / num_denum);
+		if (!num_frac) {
+			alert("Please input fraction!");
 		} else {
-			if( b !== null ) {
-				if( $.inArray(b, fbCanvasObj.selectedBars) == -1) {
-					if( !Utilities.shiftKeyDown ) {
-						fbCanvasObj.clearSelection();
-					}
-					$.each( fbCanvasObj.selectedBars, function(index, bar) {
-						bar.clearSplitSelection();
-					});
-					fbCanvasObj.barToFront(b);
-					fbCanvasObj.selectedBars.push(b);
-					b.isSelected = true;
-					b.selectSplit(fbCanvasObj.mouseDownLoc);
-				} else {
-					$.each( fbCanvasObj.selectedBars, function(index, bar) {
-						bar.clearSplitSelection();
-					});
-					if( !Utilities.shiftKeyDown ) {
-						b.selectSplit(fbCanvasObj.mouseDownLoc);
-					} else {
-						fbCanvasObj.removeBarFromSelection(b);
-					}
-					fbCanvasObj.barToFront(b);
-				}
-				if (fbCanvasObj.currentAction == "manualSplit") {
-					fbCanvasObj.clearSelection();
-				}
-			} else if( m !== null ) {
-				if( $.inArray(m, fbCanvasObj.selectedMats) == -1) {
-					if( !Utilities.shiftKeyDown ) {
-						fbCanvasObj.clearSelection();
-					}
-					m.isSelected = true;
-					fbCanvasObj.selectedMats.push(m);
-				} else {
-					if( Utilities.shiftKeyDown ) {
-						fbCanvasObj.removeMatFromSelection(m);
-					}
-				}
-			} else {
-				fbCanvasObj.clearSelection();
-			}
-			fbCanvasObj.refreshCanvas();
+			fbCanvasObj.makeMake(num_frac);
 		}
-		ne.preventDefault();
+
+		document.getElementById('whole-field').value = "";
+		document.getElementById('num-field').value = "";
+		document.getElementById('denum-field').value = "";
+		document.getElementById('dialog-make').close();
 	});
 
-	$('#fbCanvas').on('touchmove', function(e) {
-		e.preventDefault(); // Prevent scrolling/zooming
-		var ne = normalizeEvent(e, $(this));
-		fracEvent = ne;
-		updateMouseLoc(ne, $(this));
-		updateMouseAction('mousemove');
-		var p = Point.createFromMouseEvent(ne, $(this));
-		if (fbCanvasObj.currentAction == "manualSplit") {
-			fbCanvasObj.manualSplitPoint = p;
-			fbCanvasObj.refreshCanvas();
-		}
-		if(fbCanvasObj.mouseDownLoc !== null) {
-			fbCanvasObj.updateCanvas(p);
-		}
-		ne.preventDefault();
-	});
-
-	$('#fbCanvas').on('touchend', function(e) {
-		e.preventDefault(); // Prevent scrolling/zooming
-		var ne = normalizeEvent(e, $(this));
-		updateMouseLoc(ne, $(this));
-		updateMouseAction('mouseup');
-		fbCanvasObj.mouseUpLoc = Point.createFromMouseEvent(ne, $(this));
-		if( fbCanvasObj.currentAction == 'bar' ) {
-			fbCanvasObj.addUndoState();
-			fbCanvasObj.addBar() ;
-			fbCanvasObj.clear_selection_button ();
-		} else if (fbCanvasObj.currentAction == 'mat') {
-			fbCanvasObj.addUndoState();
-			fbCanvasObj.addMat();
-			fbCanvasObj.clear_selection_button ();
-		}
-		if (fbCanvasObj.found_a_drag){
-			fbCanvasObj.finalizeCachedUndoState();
-			fbCanvasObj.check_for_drag = false;
-		}
-		fbCanvasObj.mouseUpLoc = null ;
-		fbCanvasObj.mouseDownLoc = null ;
-		fbCanvasObj.mouseLastLoc = null ;
-		ne.preventDefault();
-	});
-
-	// --- Touch for color pickers and tool buttons ---
-	$('.colorBlock, .colorBlock1').on('touchstart', function(e) {
-		$(this).trigger('click');
-		e.preventDefault();
-	});
-	$('a').on('touchstart', function(e) {
-		$(this).trigger('click');
-		e.preventDefault();
+	document.querySelector("#dialog-make button[value='cancel']").addEventListener('click', function() {
+		document.getElementById('dialog-make').close();
 	});
 
 });
@@ -665,7 +484,7 @@ $( "#dialog-make" ).dialog({
 function showAllButtons() {
 	while(hiddenButtons.length >0) {
 		thing = hiddenButtons.pop();
-		thing.show();
+		thing.style.display = 'inline';
 	}
 	hiddenButtons = [];
 	hiddenButtonsName = [];
@@ -680,33 +499,28 @@ function SaveScreen() {
 }
 
 function showButton(item) {
-    var cnt = 0;
-    while(hiddenButtonsName.length >0) {
-        if (hiddenButtonsName[cnt] === item) {
-            var rem_but1=hiddenButtonsName.splice(cnt, 1);
-            hiddenButtons.splice(cnt, 1);
-        }
-        else {
-        	cnt++;
-        }
-		if (hiddenButtonsName.length === cnt) {
-			$(document.getElementById(rem_but1)).show();
-			break;
-		}
+    var index = hiddenButtonsName.indexOf(item);
+    if (index > -1) {
+        var button = hiddenButtons[index];
+        button.style.display = 'inline';
+        hiddenButtons.splice(index, 1);
+        hiddenButtonsName.splice(index, 1);
     }
 }
 
 function hideButton(item) {
-	if (hiddenButtonsName.indexOf(item)<0) {
-		hidden=document.getElementById(item) ;
-    $(hidden).hide();
- 		hiddenButtonsName.push(item);
- 		hiddenButtons.push($(hidden));
+	if (hiddenButtonsName.indexOf(item) < 0) {
+		var hidden = document.getElementById(item);
+		if (hidden) {
+			hidden.style.display = 'none';
+			hiddenButtonsName.push(item);
+			hiddenButtons.push(hidden);
+		}
 	}
 }
 
 function handleFileSelect(event) {
-	$( "#dialog-file" ).dialog("close");
+	document.getElementById("dialog-file").close();
 	var files = event.target.files;
 	if (files.length === 0) {return;}
 
@@ -824,25 +638,25 @@ function showSelectList() {
 
 
 function resetFormElement(e) {
-  e.wrap('<form>').closest('form').get(0).reset();
-  e.unwrap();
+	e.value = '';
 }
 
 
 // for debugging
 
 function updateMouseLoc(e, elem) {
-	x = e.clientX - elem.position().left ;
-	y = e.clientY - elem.position().top ;
-	offsetX = elem.offset().left;
-	offsetY	= elem.offset().top;
+	var rect = elem.getBoundingClientRect();
+	x = e.clientX - rect.left;
+	y = e.clientY - rect.top;
+	offsetX = rect.left;
+	offsetY	= rect.top;
 	/*
-	$('#mouseLoc').text(x + ', ' + y + ' | ' + offsetX  + ', ' + offsetY + ' | ' + window.pageXOffset  + ', ' + window.pageYOffset );
+	document.getElementById('mouseLoc').textContent = x + ', ' + y + ' | ' + offsetX  + ', ' + offsetY + ' | ' + window.pageXOffset  + ', ' + window.pageYOffset;
 	*/
 }
 
 function updateMouseAction(actionName) {
 	/*
-	$('#mouseAction').text(actionName) ;
+	document.getElementById('mouseAction').textContent = actionName;
 	*/
 }
