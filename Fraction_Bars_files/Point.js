@@ -38,11 +38,12 @@ Point.prototype.isOnLine = function(line) {
 
 Point.createFromMouseEvent = function(e, elem) {
 	var p = new Point();
-	// Support both mouse and normalized touch events
-	var x = (typeof e.clientX !== 'undefined') ? e.clientX : (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
-	var y = (typeof e.clientY !== 'undefined') ? e.clientY : (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
-	p.x = Math.round((x - elem.position().left) + window.pageXOffset);
-	p.y = Math.round((y - elem.position().top) + window.pageYOffset);
+	var rect = elem.getBoundingClientRect();
+	// Support both mouse and pointer events
+	var x = e.clientX;
+	var y = e.clientY;
+	p.x = Math.round(x - rect.left);
+	p.y = Math.round(y - rect.top);
 	return p;
 }
 
